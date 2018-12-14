@@ -1,0 +1,35 @@
+body {
+    font: 14px sans-serif;
+}
+.map {
+    width: 75%;
+    display: inline-block;
+}
+.sideBar {
+    width: 25%;
+    float:right;
+}
+
+#org-list {
+    height: 550px;
+    overflow: scroll;
+}
+.state {
+    fill: lightgrey;
+    stroke: white;
+    stroke-width: 1px;
+    transition: fill .1s linear;
+}
+
+.overlay {
+    fill: none;
+}
+
+.focus text {
+    fill: black;
+    font-weight: 600;
+}
+.datetext{
+    text-anchor: middle;
+    font-size: 0.5vh;
+}
