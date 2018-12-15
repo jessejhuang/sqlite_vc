@@ -1,22 +1,22 @@
 class DirectoryChart {
 
     constructor(profileChart, DB) {
-		this.profileChart = profileChart;
-		this.DB = DB;
-        this.margin = {top: 20, right: 20, bottom: 30, left: 50};
-		this.width = 350 - this.margin.left - this.margin.right;
-		this.height = 500 - this.margin.top - this.margin.bottom;
-        this.current = 2013;
-		this.cities = []; //Updated in vcMap.js when a user clicks a dot
-		this.svg = d3.select('#org-list').append('svg')
-			.attr("width", this.width + this.margin.left + this.margin.right)
-			.attr("height", this.height + this.margin.top + this.margin.bottom)
+			this.profileChart = profileChart;
+			this.DB = DB;
+					this.margin = {top: 20, right: 20, bottom: 30, left: 50};
+			this.width = 350 - this.margin.left - this.margin.right;
+			this.height = 500 - this.margin.top - this.margin.bottom;
+					this.current = 2013;
+			this.cities = []; //Updated in vcMap.js when a user clicks a dot
+			this.svg = d3.select('#org-list').append('svg')
+				.attr("width", this.width + this.margin.left + this.margin.right)
+				.attr("height", this.height + this.margin.top + this.margin.bottom)
 
-		this.svg.append('a')
-			.attr('xlink:href', '#profileChart')
-			.append('text')
-				.attr("id", "directoryChart")
-        // this.initialize();
+			this.svg.append('a')
+				.attr('xlink:href', '#profileChart')
+				.append('text')
+					.attr("id", "directoryChart")
+					// this.initialize();
     }
 
     initialize() {
@@ -56,7 +56,6 @@ class DirectoryChart {
 								self.profileChart.directoryUpdate(d);
 							})
 							.style('fill', d => {
-								console.log(d)
 								if(d.entity_type === 'Company'){
 									return '#d9e4f3';
 								}

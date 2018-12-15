@@ -15,30 +15,52 @@
     let networkGraph = new NetworkGraph(profileChart);
     // let nextChart = new NextChart();
     // let nextChart = new NextChart();
-    
+    // {"year":2013,"type":"city","cities":["Kansas City"]} 
     function networkUpdate(data){
-        $.ajax({
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(data),
-            dataType: 'json',
-            url: 'network',
-            success: function (e) {
-                networkData = JSON.stringify(e);
-                networkGraph.update(networkData);
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
+        data = JSON.parse(data);
+        let graph = {};
+        let year = data['year'];
+        let type = data['type'];
+        let cities = data['cities'];
+        if(cities){
+            let linkQuery = DB.linkQuery(year, cities, type);
+            let linkResponse = DB.processQuery(linkQuery, DB.formatLinkData);
+
+            let nodeQuery = DB.nodeQuery(linkQuery);
+            let nodeResponse = DB.processQuery(nodeQuery, DB.formatNodeData);
+            console.log('link and node queries: ', linkQuery, nodeQuery)
+            Promise.all([linkResponse, nodeResponse])
+                .then(values => {
+                    console.log('node and link responses: ', values);
+                    graph['links'] = values[0];
+                    graph['nodes'] = values[1];
+
+                    networkData = JSON.stringify(graph);
+                    networkGraph.update(networkData);
+                }, err => {
+                    console.log(err);
+                });
+        }
+        // $.ajax({
+        //     type: 'POST',
+        //     contentType: 'application/json',
+        //     data: JSON.stringify(data),
+        //     dataType: 'json',
+        //     url: 'network',
+        //     success: function (e) {
+        //         networkData = JSON.stringify(e);
+        //         networkGraph.update(networkData);
+        //     },
+        //     error: function(error) {
+        //         console.log(error);
+        //     }
+        // });
     }
 
     // Kick off query to get initial state
     let mapData = null;
     let timeData = null;
     let vcMap = new VCMap(directoryChart,networkGraph,networkUpdate);
-
-    let kickOffData = {"numRows":2};
 
     function init() {
 
@@ -59,10 +81,12 @@
             .then(e => {
                 mapData = JSON.stringify(e);
                 vcMap.initialize(mapData);
+            }) 
+            .then(() => {
                 vcMap.update();
             }, err => {
                 console.log(err);
-            }); 
+            });
         
         // Onload display year selector
         d3.json('data/metadata.json', (err, data) => {
@@ -105,10 +129,10 @@
             let query = DB.mapQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatMapData)
                 .then(e => {
-                    console.log('update map:')
-                    console.log(e);
                     mapData = JSON.stringify(e);
                     vcMap.initialize(mapData);
+                }) 
+                .then(() => {
                     vcMap.update();
                 }, err => {
                     console.log(err);
