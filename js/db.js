@@ -17,6 +17,8 @@ class Database{
 		let self = this;
 		return new Promise((resolve, reject) => {
 			self.db.then(database => {
+				console.log('ffooooo')
+				console.log(query)
 				let response = database.exec(query);
 				if (formatFunction){
 					resolve(formatFunction(response));
@@ -55,17 +57,26 @@ class Database{
 		if(funding_round_type || category_code){
 			query += 'WHERE ';
 			if(funding_round_type){
-				query += `(cb_funding_rounds.funding_round_type='${funding_round_type}' `;
+				query += `(cb_funding_rounds.funding_round_type='${funding_round_type}') `;
 			}
-			if(funding_round_type && catagory_code){
+			if(funding_round_type && category_code){
 				query += 'AND ';
 			}
-			if(catagory_code){
-				query += ', cb_objects_venture.category_code ';
+			if(category_code){
+				query += ` (cb_objects_venture.category_code='${category_code}') `;
 			}
 		}
+		// Grouping must align with selection
+		query += 'GROUP BY cb_objects_venture.city, year '
+	
+		if(funding_round_type){
+			query += ', cb_funding_rounds.funding_round_type'
+		}
+		if(category_code){
+			query += ', cb_objects_venture.category_code '
+		}
 		//Sort
-		query += 'ORDER BY cb_objects_venture.city, year '
+		query += ' ORDER BY cb_objects_venture.city, year'
 		if(limit){
 			query += `LIMIT ${limit}`;
 		}
@@ -76,8 +87,6 @@ class Database{
 	// Takes in a proxy object from a sqlalchemy query that contains data to be used in the map.
 	// Formats it into the form {"San Francisco": {"1987": 0, "1995": 0, "1996": 0...
 	formatMapData(res){
-		console.log('barbuzz')
-		console.log(res);
 		let data = res[0].values;
 		let cities = {}
 		for(let element of data){
@@ -103,5 +112,17 @@ class Database{
 		}
 		return cities;
 	}
-	
+
+	filtersQuery(field, table){
+		return `SELECT ${field} FROM ${table} GROUP BY ${field}`;
+	}
+
+	formatFilterData(res){
+		let filters = []
+		let data = res[0].values;
+		for(let element of data){
+			filters.push(element[0]);
+		}
+		return filters;
+	}
 }

@@ -58,88 +58,55 @@
         DB.processQuery(query, DB.formatMapData)
             .then(e => {
                 mapData = JSON.stringify(e);
-                console.log('MAAAAP DATA');
-                console.log(mapData);
                 vcMap.initialize(mapData);
                 vcMap.update();
             }, err => {
                 console.log(err);
             }); 
-        // $.ajax({
-        //     type: 'POST',
-        //     contentType: 'application/json',
-        //     data: JSON.stringify(["None", "None"]),
-        //     dataType: 'json',
-        //     url: 'map',
-        //     success: function (e) {
-        //         mapData = JSON.stringify(e);
-        //         // Load first chart
-        //         new Promise((resolve, reject) => {
-        //             resolve();
-        //         })
-        //             .then(() => {
-        //                 vcMap.initialize(mapData);
-        //             })
-        //             .then(() => {
-        //                 vcMap.update();
-        //             });
-
-        //     },
-        //     error: function(error) {
-        //         console.log(error);
-        //     }
-        // });
         
         // Onload display year selector
-        $.ajax({
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(kickOffData),
-            dataType: 'json',
-            url: 'timeselector',
-            success: function (e) {
-                timeData = JSON.stringify(e);
-                // Load first chart
-                let timeSelector= new TimeSelector(directoryChart,vcMap);
-                timeSelector.initiate(timeData);
-                timeSelector.refreshMap(2013);
-                timeSelector.update(timeData);
-
-            },
-            error: function(error) {
-                console.log(error);
+        d3.json('data/metadata.json', (err, data) => {
+            if(err){
+                console.log(err);
             }
+            timeData = JSON.stringify(data);
+            let timeSelector= new TimeSelector(directoryChart,vcMap);
+            timeSelector.initiate(timeData);
+            timeSelector.refreshMap(2013);
+            timeSelector.update(timeData);
         });
 
-          // On load, populate filter options
-        $.ajax({
-            type: 'POST',
-            contentType: 'application/json',
-            data: null,
-            dataType: 'json',
-            url: 'filters',
-            success: function (e) {
-                funding_round_types = JSON.parse(JSON.stringify(e['funding_round_type'])).sort();
-                categories = JSON.parse(JSON.stringify(e['categories'])).sort();
+        // On load, populate filter options
+        // funding round types
+        query = DB.filtersQuery('funding_round_type', 'cb_funding_rounds');
+        DB.processQuery(query, DB.formatFilterData)
+            .then(e => {
+                let funding_round_types = JSON.parse(JSON.stringify(e)).sort();
+                // from helpers.js
+                populateDropdown("fundingType", funding_round_types, defaultValue=undefined, defaultText="total");
+            }, err => {
+                console.log(err);
+            });
 
-                // funding type options
-                populateDropdown("fundingType", funding_round_types, defaultValue="None", defaultText="total") //From helpers.js
-
-                // category options
-                populateDropdown("categories", categories, defaultValue="None", defaultText="total") //From helpers.js
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
+        // category types
+        query = DB.filtersQuery('category_code', 'cb_objects');
+        DB.processQuery(query, DB.formatFilterData)
+            .then(e => {
+                let categories = JSON.parse(JSON.stringify(e)).sort();
+                populateDropdown("categories", categories, defaultValue=undefined, defaultText="total");
+            }, err => {
+                console.log(err);
+            });
 
         // On filter, retrieve new data
         function updateMap(){
             let funding_round_type = d3.select('#fundingType').property('value');
             let catagory_code = d3.select('#categories').property('value');
             let query = DB.mapQuery(funding_round_type, catagory_code);
-            DB.processQuery(query)
+            DB.processQuery(query, DB.formatMapData)
                 .then(e => {
+                    console.log('update map:')
+                    console.log(e);
                     mapData = JSON.stringify(e);
                     vcMap.initialize(mapData);
                     vcMap.update();
@@ -147,28 +114,6 @@
                     console.log(err);
                 });
         }
-        // function updateMap() {
-        //     data = [];
-        //     data.push(d3.select('#fundingType').property('value'));
-        //     data.push(d3.select('#categories').property('value'));
-        //     $.ajax({
-        //         type: 'POST',
-        //         contentType: 'application/json',
-        //         data: JSON.stringify(data),
-        //         dataType: 'json',
-        //         url: 'map',
-        //         success: function (e) {
-        //             mapData = JSON.stringify(e);
-        //             // Load first chart
-        //             vcMap.initialize(mapData);
-        //             vcMap.update();
-
-        //         },
-        //         error: function(error) {
-        //             console.log(error);
-        //         }
-        //     });            
-        // }
 
         d3.select('#fundingType')
           .on('change', updateMap);

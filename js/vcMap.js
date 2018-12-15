@@ -58,7 +58,6 @@ class VCMap {
         })
     }
     initialize(data){
-        
         this.data = JSON.parse(data);
     }
     
