@@ -11,7 +11,7 @@
     //Creating instances for each visualization
     let DB = new Database();
     let profileChart = new ProfileChart();
-    let directoryChart = new DirectoryChart(profileChart);
+    let directoryChart = new DirectoryChart(profileChart, DB);
     let networkGraph = new NetworkGraph(profileChart);
     // let nextChart = new NextChart();
     // let nextChart = new NextChart();

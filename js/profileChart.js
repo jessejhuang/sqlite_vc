@@ -20,7 +20,7 @@ class ProfileChart {
             .attr('y', '5%')
             .attr('width', 100)
             .attr('height', 100)
-            .attr('xlink:href', 'static/images/default_logo.jpg');
+            .attr('xlink:href', './images/default_logo.jpg');
         self.svg.append('a')
             .attr('xlink:href', 'https://washuvis.github.io/venturecapital/docs/')
             .attr('id', 'profileLink')
