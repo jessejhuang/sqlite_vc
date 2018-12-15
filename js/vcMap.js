@@ -37,7 +37,7 @@ class VCMap {
         const stateLines = d3.geoPath()
             .projection(this.projection);
         
-        d3.json('state_lines', (err, us) => {
+        d3.json('data/map/us2.json', (err, us) => {
             if(err) console.log(err);
             this.states.selectAll(".state")
                 .data(topojson.feature(us, us.objects.usStates).features)
@@ -47,7 +47,7 @@ class VCMap {
                         .attr("d", stateLines)
         });
         this.coords = new Promise((resolve, reject) => {
-            d3.json('city_coords', (err, data) => {
+            d3.json('data/map/city_coordinates.json', (err, data) => {
                 if(err) {
                     reject(err);
                 }

@@ -4,20 +4,42 @@
 <meta charset="utf-8"/>
 <link rel ="stylesheet" href="css/style.css">
 <link rel ="stylesheet" href="css/tooltip.css">
-<title>SQLite Loading test</title>
+<title>Venture Capital Networks</title>
 </head>
     <body>
         <div id="main">
-        </div>
+            <!-- TODO: WORKOUT THE CSS FOR FORMATTING THE CHARTS -->
+            <!--  NOTE: THIS IS LESS OF A PRIOIRTY THAN GETTING THE VISUALIZATIONS DONE -->
 
+            <!-- CONTENT HERE -->
+            <!-- Map chart -->
+            <div id="vcMap"></div>
+            <div id="timeSelector"></div>
+
+            <select id = "fundingType">
+            </select> 
+
+            <select id = "categories">
+            </select> 
+
+            <!-- List of entities chart -->
+            <div id="dirChart"></div>
+
+        </div>
     <!-- SCRIPTS HERE -->
     <script src="js/lib/jquery.min.js"></script>
     <script src="js/lib/d3.v4.min.js"></script>
     <script src="js/lib/topojson.v1.min.js"></script>
+    <script src="js/lib/d3-tip/index.js"></script>
     <script src="js/lib/sql.js"></script>
-    <script type="module" src="js/db.js"></script>
-    <script type="module" src="js/hello_sql.js"></script>
-
+    <script src="js/db.js"></script>
+    <script src="js/helpers.js" async defer></script>
+    <script src="js/vcMap.js" async defer></script>
+    <script src="js/timeSelector.js" async defer></script>
+    <script src="js/profileChart.js" async defer></script>
+    <script src="js/networkGraph.js" async defer></script>
+    <script src="js/directoryChart.js" async defer></script>
+    <script src="js/main.js" async defer></script>
 
 </body>
 </html>

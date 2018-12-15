@@ -9,6 +9,7 @@
     let instance = null;
 
     //Creating instances for each visualization
+    let DB = new Database();
     let profileChart = new ProfileChart();
     let directoryChart = new DirectoryChart(profileChart);
     let networkGraph = new NetworkGraph(profileChart);
@@ -53,30 +54,41 @@
         directoryChart.initialize();
 
         // Onload display map data without filters
-        $.ajax({
-            type: 'POST',
-            contentType: 'application/json',
-            data: JSON.stringify(["None", "None"]),
-            dataType: 'json',
-            url: 'map',
-            success: function (e) {
+        let query = DB.mapQuery();
+        DB.processQuery(query, DB.formatMapData)
+            .then(e => {
                 mapData = JSON.stringify(e);
-                // Load first chart
-                new Promise((resolve, reject) => {
-                    resolve();
-                })
-                    .then(() => {
-                        vcMap.initialize(mapData);
-                    })
-                    .then(() => {
-                        vcMap.update();
-                    });
+                console.log('MAAAAP DATA');
+                console.log(mapData);
+                vcMap.initialize(mapData);
+                vcMap.update();
+            }, err => {
+                console.log(err);
+            }); 
+        // $.ajax({
+        //     type: 'POST',
+        //     contentType: 'application/json',
+        //     data: JSON.stringify(["None", "None"]),
+        //     dataType: 'json',
+        //     url: 'map',
+        //     success: function (e) {
+        //         mapData = JSON.stringify(e);
+        //         // Load first chart
+        //         new Promise((resolve, reject) => {
+        //             resolve();
+        //         })
+        //             .then(() => {
+        //                 vcMap.initialize(mapData);
+        //             })
+        //             .then(() => {
+        //                 vcMap.update();
+        //             });
 
-            },
-            error: function(error) {
-                console.log(error);
-            }
-        });
+        //     },
+        //     error: function(error) {
+        //         console.log(error);
+        //     }
+        // });
         
         // Onload display year selector
         $.ajax({
@@ -121,30 +133,42 @@
             }
         });
 
-
         // On filter, retrieve new data
-        function updateMap() {
-            data = [];
-            data.push(d3.select('#fundingType').property('value'));
-            data.push(d3.select('#categories').property('value'));
-            $.ajax({
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(data),
-                dataType: 'json',
-                url: 'map',
-                success: function (e) {
+        function updateMap(){
+            let funding_round_type = d3.select('#fundingType').property('value');
+            let catagory_code = d3.select('#categories').property('value');
+            let query = DB.mapQuery(funding_round_type, catagory_code);
+            DB.processQuery(query)
+                .then(e => {
                     mapData = JSON.stringify(e);
-                    // Load first chart
                     vcMap.initialize(mapData);
                     vcMap.update();
-
-                },
-                error: function(error) {
-                    console.log(error);
-                }
-            });            
+                }, err => {
+                    console.log(err);
+                });
         }
+        // function updateMap() {
+        //     data = [];
+        //     data.push(d3.select('#fundingType').property('value'));
+        //     data.push(d3.select('#categories').property('value'));
+        //     $.ajax({
+        //         type: 'POST',
+        //         contentType: 'application/json',
+        //         data: JSON.stringify(data),
+        //         dataType: 'json',
+        //         url: 'map',
+        //         success: function (e) {
+        //             mapData = JSON.stringify(e);
+        //             // Load first chart
+        //             vcMap.initialize(mapData);
+        //             vcMap.update();
+
+        //         },
+        //         error: function(error) {
+        //             console.log(error);
+        //         }
+        //     });            
+        // }
 
         d3.select('#fundingType')
           .on('change', updateMap);
