@@ -16,6 +16,8 @@ class Database{
 			d3.request('https://cors.io/?https://github.com/jessejhuang/sqlite_vc/blob/master/data/raw_crunchbase.db?raw=true')
 				.header("X-Requested-With", "XMLHttpRequest")
 				.header('Access-Control-Allow-Origin', '*')
+				.header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS')
+				.header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token')
 				.responseType('arraybuffer')
 				.get((err, data) => {
 					if(err){
