@@ -12,12 +12,11 @@ class Database{
 			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
 		];
 		this.db = new Promise((resolve, reject) => {
-			// d3.request('data/raw_crunchbase.db')
-			d3.request('https://cors.io/?https://github.com/jessejhuang/sqlite_vc/blob/master/data/raw_crunchbase.db?raw=true')
+			d3.request('data/raw_crunchbase.db')
+			// d4.request('https://rawcrunchbasedb.blob.core.windows.net/raw/raw_crunchbase.db?sp=r&st=2018-12-16T02:31:46Z&se=2019-01-03T10:31:46Z&sip=0.0.0.0-255.255.255.255&spr=https&sv=2018-03-28&sig=ozV5CpPZKudt4iEcPs%2BsnrlRTm7feTQ0ysiuBVWh0hY%3D&sr=b')
 				.header("X-Requested-With", "XMLHttpRequest")
 				.header('Access-Control-Allow-Origin', '*')
-				.header('Access-Control-Allow-Methods: GET, POST, PATCH, PUT, DELETE, OPTIONS')
-				.header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token')
+				.header('Access-Control-Allow-Methods' ,'GET, POST')
 				.responseType('arraybuffer')
 				.get((err, data) => {
 					if(err){

@@ -3,7 +3,7 @@
  */
 (function(){
     /**
-     * Creates instances for every chart (classes created to handle each chart;
+     * Creates instances for every chart (classes created to handle each chart);
      * the classes are defined in the respective javascript files.
      */
     let instance = null;
@@ -172,6 +172,10 @@
         return instance;
     }
 
-    Main.getInstance();
+    // Wait till DB loads to initiate
+    DB.db.then(() => {
+        Main.getInstance();
+    });
+    
 })();
 // EOF
