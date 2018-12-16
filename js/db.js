@@ -13,7 +13,7 @@ class Database{
 		];
 		this.db = new Promise((resolve, reject) => {
 			// d3.request('data/raw_crunchbase.db')
-			d3.request('http://cors.io/?https://github.com/jessejhuang/sqlite_vc/blob/master/data/raw_crunchbase.db?raw=true')
+			d3.request('https://cors.io/?https://github.com/jessejhuang/sqlite_vc/blob/master/data/raw_crunchbase.db?raw=true')
 				.header("X-Requested-With", "XMLHttpRequest")
 				.responseType('arraybuffer')
 				.get((err, data) => {
