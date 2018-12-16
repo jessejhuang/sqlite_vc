@@ -162,7 +162,7 @@
      * @returns {Main singleton class |*}
      */
     Main.getInstance = function(){
-        let self = this
+        let self = this;
         if(self.instance == null){
             self.instance = new Main();
 
@@ -170,7 +170,7 @@
             init();
         }
         return instance;
-    }
+    };
 
     // Wait till DB loads to initiate
     DB.db.then(() => {

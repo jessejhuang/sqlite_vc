@@ -32,8 +32,8 @@ class Database{
 		let self = this;
 		return new Promise((resolve, reject) => {
 			self.db.then(database => {
-				console.log('Process Query: ')
-				console.log(query)
+				console.log('Process Query: ');
+				console.log(query);
 				let response = database.exec(query);
 				if (formatFunction){
 					resolve(formatFunction(response));
@@ -42,7 +42,7 @@ class Database{
 					resolve(response);
 				}
 			}, err => {
-				reject(err)
+				reject(err);
 			});
 		});
 	}
@@ -82,16 +82,16 @@ class Database{
 			}
 		}
 		// Grouping must align with selection
-		query += 'GROUP BY cb_objects_venture.city, year '
+		query += 'GROUP BY cb_objects_venture.city, year ';
 	
 		if(funding_round_type){
-			query += ', cb_funding_rounds.funding_round_type'
+			query += ', cb_funding_rounds.funding_round_type';
 		}
 		if(category_code){
-			query += ', cb_objects_venture.category_code '
+			query += ', cb_objects_venture.category_code ';
 		}
 		//Sort
-		query += ' ORDER BY cb_objects_venture.city, year'
+		query += ' ORDER BY cb_objects_venture.city, year';
 		if(limit){
 			query += `LIMIT ${limit}`;
 		}
@@ -103,7 +103,7 @@ class Database{
 	// Formats it into the form {"San Francisco": {"1987": 0, "1995": 0, "1996": 0...
 	formatMapData(res){
 		let data = res[0].values;
-		let cities = {}
+		let cities = {};
 		for(let element of data){
 			let city = element[0];
 			let raised = element[1];
@@ -133,7 +133,7 @@ class Database{
 	}
 
 	formatFilterData(res){
-		let filters = []
+		let filters = [];
 		let data = res[0].values;
 		for(let element of data){
 			filters.push(element[0]);
@@ -186,13 +186,13 @@ class Database{
 				`;
 			}
 			if(i != crunchbaseTypes.length - 1){
-				query += ' UNION '
+				query += ' UNION ';
 			}
 		}
 		if(limit){
 			query += ` LIMIT ${limit}`;
 		}
-		query += ';'
+		query += ';';
 		return query;
 	}
 
@@ -209,10 +209,10 @@ class Database{
 			'cb_funding_rounds.raised_amount_usd',
 			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
 		];
-		let entities = []
+		let entities = [];
 		let data = res[0].values;
 		for(let element of data){
-			let entity = {}
+			let entity = {};
 			for(let i = 0; i < element.length; i++){
 				entity[directoryColumns[i]] = element[i];
 			}
@@ -265,14 +265,14 @@ class Database{
 		let data = res[0].values;
 		let links = [];
 		let rows = [];
-		for(element of data){
-			rows.push(element)
+		for(let element of data){
+			rows.push(element);
 			let formatted_row = {
 				source: element[0],
 				target: element[1],
 				amount: element[2]
 			};
-			links.append(formatted_row);
+			links.push(formatted_row);
 		}
 		console.log('format link data raw link: ', rows);
 		console.log('format link data: links: ', links);
@@ -300,7 +300,7 @@ class Database{
 			};
 			nodes.append(formatted_row);
 		}
-		print('Format Node Data nodes: ', nodes)
+		print('Format Node Data nodes: ', nodes);
 		return nodes;
 	}
 }
