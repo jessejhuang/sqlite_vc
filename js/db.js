@@ -301,7 +301,7 @@
 		return entities;
 	}
 
-	linkQuery(year, cities, network_type){
+	linkQuery(yearMin,yearMax, cities, network_type){
 		if(cities.length == 1){
 			cities = `(\'${cities[0]}\')`;
 		} else{
@@ -322,8 +322,8 @@
 		`;
 		if(network_type === 'city' || !network_type){
 			query += `
-				WHERE (cb_objects_venture.city IN ${cities}) AND
-				(STRFTIME('%Y', cb_funding_rounds.funded_at)=\'${year}\')
+				WHERE (cb_objects_venture.city IN ${cities}) AND \
+				(STRFTIME('%Y', cb_funding_rounds.funded_at) BETWEEN \'${yearMin}\' AND \'${yearMax}\')
 			`;
 		}
 		else if(network_type === 'entity'){

@@ -183,7 +183,7 @@ class VCMap {
                         // Update the directory chart based on the list of selected cities
                         self.directoryChart.cities = self.selectedCities;
                         self.directoryChart.update();
-                        let networkParams = {"year":self.current,"type":"city","cities":self.selectedCities};
+                        let networkParams = {"yearMin":self.current,"yearMax":self.maxYear,"type":"city","cities":self.selectedCities};
                         self.networkUpdate(JSON.stringify(networkParams));
                     })
                     .style('fill', 'rgb(217,91,67)')	
@@ -200,7 +200,7 @@ class VCMap {
         self.selectedCities = [];
         self.directoryChart.cities = self.selectedCities;
         self.directoryChart.update();
-        let networkParams = {"year":self.current,"type":"city","cities":self.selectedCities};
+        let networkParams = {"yearMin":self.current,"yearMax":self.maxYear,"type":"city","cities":self.selectedCities};
         self.networkUpdate(JSON.stringify(networkParams));
     }
 
