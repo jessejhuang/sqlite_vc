@@ -44,7 +44,7 @@ class VCMap {
                 .enter()
                     .append("path")
                         .attr("class", "state")
-                        .attr("d", stateLines)
+                        .attr("d", stateLines);
         });
         this.coords = new Promise((resolve, reject) => {
             d3.json('data/map/city_coordinates.json', (err, data) => {
@@ -55,7 +55,7 @@ class VCMap {
                     resolve(data);
                 }
             });
-        })
+        });
     }
     initialize(data){
         this.data = JSON.parse(data);
@@ -127,12 +127,12 @@ class VCMap {
                         if (self.selectedCities.indexOf(city) >= 0) {
                             let spliceIndex = self.selectedCities.indexOf(city);
                             self.selectedCities.splice(spliceIndex, 1);
-                            d3.select(this).style('fill', 'rgb(217, 91, 67')
+                            d3.select(this).style('fill', 'rgb(217, 91, 67');
                         } 
                         // City is not selected. Update selected list
                         else {
                             self.selectedCities.push(city);
-                            d3.select(this).style('fill', 'rgb(255,255,51)')
+                            d3.select(this).style('fill', 'rgb(255,255,51)');
                         }
                         // Update the directory chart based on the list of selected cities
                         self.directoryChart.cities = self.selectedCities;
