@@ -287,7 +287,10 @@
 			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
 		];
 		let entities = [];
-		let data = res[0].values;
+		let data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
 		for(let element of data){
 			let entity = {};
 			for(let i = 0; i < element.length; i++){
