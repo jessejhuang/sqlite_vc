@@ -12,8 +12,8 @@ class Database{
 			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
 		];
 		this.db = new Promise((resolve, reject) => {
-			// d3.request('data/raw_crunchbase.db')
-			d3.request('https://rawcrunchbasedb.blob.core.windows.net/raw/raw_crunchbase.db?sp=r&st=2018-12-16T02:31:46Z&se=2019-01-03T10:31:46Z&sip=0.0.0.0-255.255.255.255&spr=https&sv=2018-03-28&sig=ozV5CpPZKudt4iEcPs%2BsnrlRTm7feTQ0ysiuBVWh0hY%3D&sr=b')
+			d3.request('data/raw_crunchbase.db')
+			// d3.request('https://s3.amazonaws.com/raw-crunchbase-db/raw_crunchbase.db')
 				.header("X-Requested-With", "XMLHttpRequest")
 				.header('Access-Control-Allow-Origin', '*')
 				.header('Access-Control-Allow-Methods' ,'GET, POST')
@@ -211,6 +211,7 @@ class Database{
 		];
 		let entities = []
 		let data = res[0].values;
+		console.log('formatDirectoryData: ',data);
 		for(let element of data){
 			let entity = {}
 			for(let i = 0; i < element.length; i++){
@@ -218,6 +219,7 @@ class Database{
 			}
 			entities.push(entity);
 		}
+		console.log('entities: ', entities)
 		return entities;
 	}
 
@@ -236,8 +238,8 @@ class Database{
 			STRFTIME(\'%Y\', cb_funding_rounds.funded_at) as year,
 			cb_objects_vc.name as source, cb_objects_venture.name as target
 			FROM cb_investments
-			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id  \
-			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id  \
+			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id
+			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id
 			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id
 		`;
 		if(network_type === 'city' || !network_type){
