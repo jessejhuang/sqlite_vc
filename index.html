@@ -2,37 +2,54 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link rel ="stylesheet" href="css/style.css">
+<link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
 <link rel ="stylesheet" href="css/tooltip.css">
 <title>Venture Capital Networks</title>
 </head>
     <body>
         <div id="main">
-            <!-- TODO: WORKOUT THE CSS FOR FORMATTING THE CHARTS -->
-            <!--  NOTE: THIS IS LESS OF A PRIOIRTY THAN GETTING THE VISUALIZATIONS DONE -->
-
-            <!-- CONTENT HERE -->
-            <!-- Map chart -->
-            <div id="vcMap" class="map"></div>
-            <div id="directory" class="sideBar">
-                <h3>Organizations</h3>
-                <div id="org-list"></div>
-            </div>
-            <div id="timeSelector"></div>
-
-            <select id = "fundingType">
-            </select> 
-
-            <select id = "categories">
-            </select> 
-
-            <!-- List of entities chart -->
-            <div id="networkGraph"></div>
-            <div id="profileChart">
-
+            <!--<div class="container">-->
+        
+                <!-- TODO: WORKOUT THE CSS FOR FORMATTING THE CHARTS -->
+                <!--  NOTE: THIS IS LESS OF A PRIOIRTY THAN GETTING THE VISUALIZATIONS DONE -->
+    
+                <!-- CONTENT HERE -->
+                <!-- Map chart -->
+                
+                <div id="vcMap" class="map"></div>
+                <div id="directory" class="sideBar">
+                    <h3>Organizations</h3>
+                    <div id="org-list"></div>
+                </div>
+                <div id="timeSelector"></div>
+                
+                <div class="row">
+                    <div class="input-field col s3">
+                        <select id = "fundingType">
+                            
+                        </select>
+                        <label>Fund Type Select</label>
+                    </div>
+                    <div class="input-field col s3">
+                        <select id = "categories">
+                           
+                        </select>
+                        <label>Category Select</label>
+                    </div>
+                </div>
+       
+                <!-- List of entities chart -->
+                <div id="networkGraph"></div>
+                <div id="profileChart">
+                    
+            <!--</div>-->
         </div>
     <!-- SCRIPTS HERE -->
-    <script src="js/lib/jquery.min.js"></script>
+   <!-- <script src="js/lib/jquery.min.js"></script>-->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    <script src="js/lib/materialize.min.js"></script>
     <script src="js/lib/d3.v4.min.js"></script>
     <script src="js/lib/topojson.v1.min.js"></script>
     <script src="js/lib/d3-tip/index.js"></script>
