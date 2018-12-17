@@ -1,11 +1,12 @@
 Wish list
-Eliminate pre 2000
-Brushing for timeline
+Eliminate pre 2000 X
+Brushing for timeline X
+Filterable summary line chart X
 Process book
-Filterable summary line chart
-Color ventures vs VCs
-Summary stats in city hover
-Little charts in profiles
+Vis div'ing and styling towards "website" -- John starting
+Network features -- Different Shapes, Edge Weight, IPO/Acquired/Closed coloring
+Summary stats in city hover -- Jack pending
+
+Little charts in profiles 
 In profiles, links to related profiles
 Transitions for play
-IPO/Acquired/Closed coloring
