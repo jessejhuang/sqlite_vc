@@ -61,8 +61,12 @@
     let mapData = null;
     let timeData = null;
     let vcMap = new VCMap(directoryChart,networkGraph,networkUpdate);
+    let timeSelector= new TimeSelector(directoryChart,vcMap);
 
     function init() {
+        // let testQ = DB.lineQuery();
+        // let testRes = DB.processQuery(testQ, DB.formatLineQuery)
+        // console.log(testRes);
 
         // TODO:
         // INITIALIZE AND CREATE FORCE DIRECTED GRAPH
@@ -87,18 +91,36 @@
             }, err => {
                 console.log(err);
             });
+
+
         
         // Onload display year selector
-        d3.json('data/metadata.json', (err, data) => {
-            if(err){
+        // d3.json('data/metadata.json', (err, data) => {
+        //     if(err){
+        //         console.log(err);
+        //     }
+        //     timeData = JSON.stringify(data);
+        //     console.log("timeData:" + timeData);
+        //     let timeSelector= new TimeSelector(directoryChart,vcMap);
+        //     timeSelector.initiate(timeData);
+        //     timeSelector.refreshMap(2013);
+        //     timeSelector.update(timeData);
+        // });
+
+        // Onload display year selector
+        query = DB.lineQuery(funding_round_type="None", catagory_code="None");
+        DB.processQuery(query, DB.formatLineData)
+            .then(e => {
+                lineData = e;
+                console.log("Line data: " + lineData)
+                timeSelector.initiate(lineData);
+            }) 
+            .then(() => {
+                timeSelector.update();
+            }, err => {
                 console.log(err);
-            }
-            timeData = JSON.stringify(data);
-            let timeSelector= new TimeSelector(directoryChart,vcMap);
-            timeSelector.initiate(timeData);
-            timeSelector.refreshMap(2013);
-            timeSelector.update(timeData);
-        });
+            });
+
 
         // On load, populate filter options
         // funding round types
@@ -139,11 +161,35 @@
                 });
         }
 
+        // On filter, retrieve new data
+        function updateLine() {
+            let funding_round_type = d3.select('#fundingType').property('value');
+            let catagory_code = d3.select('#categories').property('value');
+
+            query = DB.lineQuery(funding_round_type, catagory_code);
+            DB.processQuery(query, DB.formatLineData)
+                .then(e => {
+                    lineData = e;
+                    console.log("new line data: " + lineData);
+                    timeSelector.initiate(lineData);
+                }) 
+                .then(() => {
+                    timeSelector.update();
+                }, err => {
+                    console.log(err);
+                });
+        }
+
+        function filterUpdates() {
+            updateMap();
+            updateLine();
+        }
+
         d3.select('#fundingType')
-          .on('change', updateMap);
+          .on('change', filterUpdates);
 
         d3.select('#categories')
-          .on('change', updateMap);
+          .on('change', filterUpdates);
 
     }
 

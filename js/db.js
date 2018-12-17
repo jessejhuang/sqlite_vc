@@ -1,4 +1,4 @@
-class Database{
+ class Database{
 
 	constructor(){
 		this.directoryColumns = [
@@ -127,6 +127,83 @@ class Database{
 		}
 		return cities;
 	}
+
+	lineQuery(funding_round_type="None", category_code="None") {
+		if (funding_round_type=="None") {
+			funding_round_type=false;
+		}
+		if (category_code=="None") { 
+			category_code=false
+		}
+
+		let query = "";
+
+		//  Nested query
+		query += "SELECT SUM(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'  \n FROM \n ("
+
+		//  Inner query
+		//  query += 'SELECT DISTINCT cb_objects_venture.name, cb_funding_rounds.funded_at, \
+				//  cb_funding_rounds.raised_amount' 
+
+		query += 'SELECT DISTINCT cb_objects_venture.name, cb_objects_venture.city, \
+				cb_funding_rounds.raised_amount, cb_funding_rounds.funded_at'
+
+		//  Joining
+		query+=	'\nFROM cb_investments \n \
+			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id \n \
+			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id \n \
+			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id'
+
+		//  Filtering
+		if (funding_round_type || category_code) {
+			query += '\nWHERE \n (cb_objects_venture.country_code=\'USA\') \n AND \n (cb_objects_venture.state_code!=\'None\')'
+		}
+
+		if (funding_round_type || category_code) {
+			query += '\n AND'
+		}
+
+		if (funding_round_type) {
+			query += '\n (cb_funding_rounds.funding_round_type=\'' + funding_round_type + '\') '
+		}
+
+		if (funding_round_type && category_code) {
+			query += '\n AND'
+		}
+
+		if (category_code) {
+			query += '\n (cb_objects_venture.category_code=\'' + category_code + '\')'
+		}
+
+		//  End nested query
+		query += '\n ) t '
+
+		//  Grouping must align with selection
+		query += '\nGROUP BY year'
+		
+		//  Sort
+		query += '\nORDER BY year' 
+
+		//  Finish
+		query += ";"
+		return(query)
+	}
+
+
+	formatLineData(res) {
+		let data = res[0].values;
+		let obj;
+		let jsonString;
+		let elements = [];
+		for(let element of data){
+			obj = new Object();
+			obj.amount  = "" + element[0];
+			obj.year = parseInt(element[1]);
+			elements.push(obj);
+		}
+		return(JSON.stringify(elements));
+	}
+
 
 	filtersQuery(field, table){
 		return `SELECT ${field} FROM ${table} GROUP BY ${field}`;
