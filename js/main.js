@@ -19,21 +19,21 @@
     function networkUpdate(data){
         data = JSON.parse(data);
         let graph = {};
-        let year = data['year'];
-        let type = data['type'];
-        let cities = data['cities'];
+        let year = data.year;
+        let type = data.type;
+        let cities = data.cities;
         if(cities){
             let linkQuery = DB.linkQuery(year, cities, type);
             let linkResponse = DB.processQuery(linkQuery, DB.formatLinkData);
 
             let nodeQuery = DB.nodeQuery(linkQuery);
             let nodeResponse = DB.processQuery(nodeQuery, DB.formatNodeData);
-            console.log('link and node queries: ', linkQuery, nodeQuery)
+            //console.log('link and node queries: ', linkQuery, nodeQuery)
             Promise.all([linkResponse, nodeResponse])
                 .then(values => {
-                    console.log('node and link responses: ', values);
-                    graph['links'] = values[0];
-                    graph['nodes'] = values[1];
+                    //console.log('node and link responses: ', values);
+                    graph.links = values[0];
+                    graph.nodes = values[1];
 
                     networkData = JSON.stringify(graph);
                     networkGraph.update(networkData);

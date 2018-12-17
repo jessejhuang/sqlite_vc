@@ -32,8 +32,8 @@ class Database{
 		let self = this;
 		return new Promise((resolve, reject) => {
 			self.db.then(database => {
-				console.log('Process Query: ');
-				console.log(query);
+				//console.log('Process Query: ');
+				//console.log(query);
 				let response = database.exec(query);
 				if (formatFunction){
 					resolve(formatFunction(response));
@@ -230,20 +230,20 @@ class Database{
 		}
 
 		let query = `
-			SELECT t.source, t.target, CAST(t.raised_amount as TEXT) as raised_amount FROM
-				(SELECT cb_investments.investor_object_id, cb_investments.funded_object_id,
-				 SUM(cb_funding_rounds.raised_amount) as raised_amount,
-			STRFTIME(\'%Y\', cb_funding_rounds.funded_at) as year,
-			cb_objects_vc.name as source, cb_objects_venture.name as target
-			FROM cb_investments
+			SELECT t.source, t.target, CAST(t.raised_amount as TEXT) as raised_amount FROM \
+				(SELECT cb_investments.investor_object_id, cb_investments.funded_object_id, \
+				 SUM(cb_funding_rounds.raised_amount) as raised_amount, \
+			STRFTIME('%Y', cb_funding_rounds.funded_at) as year, \
+			cb_objects_vc.name as source, cb_objects_venture.name as target \
+			FROM cb_investments \
 			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id  \
 			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id  \
-			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id
+			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id \
 		`;
 		if(network_type === 'city' || !network_type){
 			query += `
 				WHERE (cb_objects_venture.city IN ${cities}) AND
-				(STRFTIME(\'%Y\', cb_funding_rounds.funded_at)=\'${year}\')
+				(STRFTIME('%Y', cb_funding_rounds.funded_at)=\'${year}\')
 			`;
 		}
 		else if(network_type === 'entity'){
@@ -258,11 +258,15 @@ class Database{
 			ORDER BY raised_amount DESC) t LIMIT 40
 		`;
 		return query;
+		
 	}
 
 	formatLinkData(res){
-		console.log('format link data:', res);
-		let data = res[0].values;
+		//console.log('format link data:', res);
+		var data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
 		let links = [];
 		let rows = [];
 		for(let element of data){
@@ -274,33 +278,36 @@ class Database{
 			};
 			links.push(formatted_row);
 		}
-		console.log('format link data raw link: ', rows);
-		console.log('format link data: links: ', links);
+		//console.log('format link data raw link: ', rows);
+		//console.log('format link data: links: ', links);
 		return links;
 	}
 
 	nodeQuery(linkQuery){
 		let query = `
 			SELECT DISTINCT t.source, \"vc\" as type	
-			FROM (\'${linkQuery}\') t
+			FROM (${linkQuery}) t
 			UNION SELECT DISTINCT t.target, \"venture\" as type
-			FROM (\'${linkQuery}\') t
+			FROM (${linkQuery}) t
 			ORDER BY type
 		`;
 		return query;
 	}
 
 	formatNodeData(res){
-		let data = res[0].values;
-		nodes = [];
+		var data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
+		let nodes = [];
 		for(let element of data){
 			let formatted_row = {
 				name: element[0],
 				type: element[1]
 			};
-			nodes.append(formatted_row);
+			nodes.push(formatted_row);
 		}
-		print('Format Node Data nodes: ', nodes);
+		//console.log('Format Node Data nodes: ', nodes);
 		return nodes;
 	}
 }
