@@ -186,7 +186,7 @@
 
 		//  Finish
 		query += ";"
-		return(query)
+		return(query);
 	}
 
 
