@@ -9,4 +9,6 @@ function populateDropdown(dropdownID, listOfItems, defaultValue, defaultText) {
         $dropdown.append($("<option />").val(this).text(this));
     });
 }
+
+
 // EOF

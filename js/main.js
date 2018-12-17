@@ -112,7 +112,7 @@
         DB.processQuery(query, DB.formatLineData)
             .then(e => {
                 lineData = e;
-                console.log("Line data: " + lineData)
+                console.log("Line data: " + lineData);
                 timeSelector.initiate(lineData);
             }) 
             .then(() => {
@@ -123,6 +123,10 @@
 
 
         // On load, populate filter options
+        //Prep materialize select
+        $( document ).ready(function() {
+            $('select').formSelect($('select').on('change', filterUpdates));
+        });
         // funding round types
         query = DB.filtersQuery('funding_round_type', 'cb_funding_rounds');
         DB.processQuery(query, DB.formatFilterData)
@@ -146,8 +150,12 @@
 
         // On filter, retrieve new data
         function updateMap(){
-            let funding_round_type = d3.select('#fundingType').property('value');
-            let catagory_code = d3.select('#categories').property('value');
+            //let funding_round_type = d3.select('#fundingType').property('value');
+            //let catagory_code = d3.select('#categories').property('value');
+            //let funding_round_type = d3.select('#fundingType').getSelectedValues();
+            //let catagory_code = d3.select('#categories').getSelectedValues();
+            let funding_round_type = $('#fundingType').val();
+            let catagory_code = $('#categories').val();
             let query = DB.mapQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatMapData)
                 .then(e => {
@@ -160,6 +168,7 @@
                     console.log(err);
                 });
         }
+
 
         // On filter, retrieve new data
         function updateLine() {
@@ -185,11 +194,12 @@
             updateLine();
         }
 
-        d3.select('#fundingType')
-          .on('change', filterUpdates);
+        //d3.select('#fundingType')
+        //  .on('change', filterUpdates);
+        //
+        //d3.select('#categories')
+        //  .on('change', filterUpdates);
 
-        d3.select('#categories')
-          .on('change', filterUpdates);
 
     }
 
