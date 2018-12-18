@@ -6,6 +6,13 @@
      * Creates instances for every chart (classes created to handle each chart);
      * the classes are defined in the respective javascript files.
      */
+    //Prep materialize
+    $( document ).ready(function() {
+        M.AutoInit();
+    });
+    
+    
+    
     let instance = null;
 
     //Creating instances for each visualization
@@ -123,17 +130,15 @@
 
 
         // On load, populate filter options
-        //Prep materialize select
-        $( document ).ready(function() {
-            $('select').formSelect($('select').on('change', filterUpdates));
-        });
+        
         // funding round types
         query = DB.filtersQuery('funding_round_type', 'cb_funding_rounds');
         DB.processQuery(query, DB.formatFilterData)
             .then(e => {
                 let funding_round_types = JSON.parse(JSON.stringify(e)).sort();
                 // from helpers.js
-                populateDropdown("fundingType", funding_round_types, defaultValue=undefined, defaultText="total");
+                populateDropdown("fundingType", funding_round_types, defaultValue="total", defaultText="total");
+                $('select').formSelect($('select').on('change', filterUpdates));
             }, err => {
                 console.log(err);
             });
@@ -143,19 +148,24 @@
         DB.processQuery(query, DB.formatFilterData)
             .then(e => {
                 let categories = JSON.parse(JSON.stringify(e)).sort();
-                populateDropdown("categories", categories, defaultValue=undefined, defaultText="total");
+                populateDropdown("categories", categories, defaultValue="total", defaultText="total");
+                $('select').formSelect($('select').on('change', filterUpdates));
             }, err => {
                 console.log(err);
             });
 
         // On filter, retrieve new data
         function updateMap(){
-            //let funding_round_type = d3.select('#fundingType').property('value');
-            //let catagory_code = d3.select('#categories').property('value');
-            //let funding_round_type = d3.select('#fundingType').getSelectedValues();
-            //let catagory_code = d3.select('#categories').getSelectedValues();
-            let funding_round_type = $('#fundingType').val();
-            let catagory_code = $('#categories').val();
+         
+            var f_instance = M.FormSelect.getInstance($('#fundingType'));
+            var c_instance = M.FormSelect.getInstance($('#categories'));
+
+            let funding_round_type = f_instance.getSelectedValues();
+            let catagory_code = c_instance.getSelectedValues();
+            
+            console.log("funding types: ", funding_round_type);
+            console.log("catagory types: ", catagory_code);
+            
             let query = DB.mapQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatMapData)
                 .then(e => {
@@ -172,8 +182,15 @@
 
         // On filter, retrieve new data
         function updateLine() {
-            let funding_round_type = d3.select('#fundingType').property('value');
-            let catagory_code = d3.select('#categories').property('value');
+
+            var f_instance = M.FormSelect.getInstance($('#fundingType'));
+            var c_instance = M.FormSelect.getInstance($('#categories'));
+
+            let funding_round_type = f_instance.getSelectedValues();
+            let catagory_code = c_instance.getSelectedValues();
+            
+            console.log("funding types: ", funding_round_type);
+            console.log("catagory types: ", catagory_code);
 
             query = DB.lineQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatLineData)
