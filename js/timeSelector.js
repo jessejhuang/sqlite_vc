@@ -191,7 +191,7 @@ class TimeSelector {
                 .style("stroke-linecap", "round")
                 .style("stroke-linejoin", "round");
             // UPDATE DICTIONARY WITH LINE NAME -> COLORS
-            lineNameToColor[keys[i]] = this.lineColors[i]
+            this.lineNameToColor[keys[i]] = this.lineColors[i]
         }
 
           context.append("g")
