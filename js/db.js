@@ -159,10 +159,10 @@
 		let processFundingRound =true;
 		let processCategoryCode =true;
 
-		if (funding_round_type===["total"]) {
+		if (funding_round_type[0]=='total') {
 			processFundingRound=false;
 		}
-		if (category_code===["total"]) { 
+		if (category_code[0]=='total') { 
 			processCategoryCode=false;
 		}
 
