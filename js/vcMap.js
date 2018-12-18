@@ -137,7 +137,7 @@ class VCMap {
                         for (var i = self.current; i < self.maxYear+1; i++) {
                             nextFunds = data[city][i];
                             if ( (nextFunds != 0) && (typeof(nextFunds) != "undefined") ){
-                                funds += nextFunds
+                                funds += nextFunds;
                             }
                         }
                         // let funds = data[city][self.current];
@@ -151,7 +151,7 @@ class VCMap {
                         for (var i = self.current; i < self.maxYear+1; i++) {
                             nextFunds = data[city][i];
                             if ( (nextFunds != 0) && (typeof(nextFunds) != "undefined") ){
-                                funds += nextFunds
+                                funds += nextFunds;
                             }
                         }
                         let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');

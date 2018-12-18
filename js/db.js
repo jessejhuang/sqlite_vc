@@ -326,8 +326,11 @@
 				(STRFTIME('%Y', cb_funding_rounds.funded_at) BETWEEN \'${yearMin}\' AND \'${yearMax}\')
 			`;
 		}
-		else if(network_type === 'entity'){
-			console.log('link query: entity network');
+		else if(network_type === 'vc'){
+			console.log('link query: vc network');
+		}
+		else if(network_type === 'venture'){
+			console.log('link query: venture network');
 		}
 		else{
 			console.log('link query: invalid network type');
