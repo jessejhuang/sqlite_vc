@@ -10,6 +10,8 @@ class TimeSelector {
         this.margin = {top: 20, right: 100, bottom: 50, left: 200};
         this.width = 1200 - this.margin.left - this.margin.right;
         this.height = 300 - this.margin.top - this.margin.bottom;
+        this.width_full = 1200;
+        this.height_full = 300;
         this.current = '2013';
 
         this.lineNameToColor = new Object();
@@ -137,8 +139,10 @@ class TimeSelector {
         self.svg = d3.select("#timeSelector")
                 .append("svg")
                 .attr("id", "timeSVG")
-                .attr("width", self.width + self.margin.left + self.margin.right)
-                .attr("height", self.height + self.margin.top + self.margin.bottom)
+                .attr("preserveAspectRatio", "xMinYMin meet")
+                .attr("viewBox", "0 0 "+this.width_full+" "+this.height_full)
+                //.attr("width", self.width + self.margin.left + self.margin.right)
+                //.attr("height", self.height + self.margin.top + self.margin.bottom)
                 .attr("align","center");
         // Brush
         function brushed() {

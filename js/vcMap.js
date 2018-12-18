@@ -9,6 +9,8 @@ class VCMap {
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.width = 1020 - this.margin.left - this.margin.right;
         this.height = 550 - this.margin.top - this.margin.bottom;
+        this.width_full = 1020;
+        this.height_full = 550;
         this.current = 2013;
         this.maxYear = 2013;
         this.selectedCities = [];
@@ -26,8 +28,10 @@ class VCMap {
 
 
         this.svg = d3.select("#vcMap").append("svg")
-            .attr("width", this.width + this.margin.left + this.margin.right)
-            .attr("height", this.height + this.margin.top + this.margin.bottom)
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 "+this.width+" "+this.height)
+            //.attr("width", this.width + this.margin.left + this.margin.right)
+            //.attr("height", this.height + this.margin.top + this.margin.bottom)
             .attr("align","center")
             .attr("id", "vcMapChart")
             .call(zoom);
