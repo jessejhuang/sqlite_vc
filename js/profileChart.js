@@ -1,8 +1,8 @@
 class ProfileChart {
 
     constructor(DB) {
-        this.DB = DB;
         this.height = 550;
+        this.db = DB;
         this.svg = d3.select('#profileChart').append('svg')
             .attr('width', '100%')
             .attr('height', this.height)
@@ -112,7 +112,9 @@ class ProfileChart {
     }
 
     directoryUpdate(data){
-        console.log(data);
+        let self = this;
+        let query = self.db.profileQuery(data.name);
+        self.db.processQuery(query, self.db.formatProfileData);
         let companyType = data.entity_type === 'FinancialOrg' ? 'VC Firm' : 'Venture'
         let logo = data.logo_url ? data.logo_url : 'static/images/default_logo.jpg';
         let homepage = data.homepage_url ? data.homepage_url : 'https://www.pixar.com/404';
@@ -174,7 +176,7 @@ class ProfileChart {
             .text(fundingType);
     }
 
-    update(name) {
+    update(data) {
     }
 }
 // EOF

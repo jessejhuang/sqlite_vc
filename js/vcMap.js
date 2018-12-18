@@ -1,10 +1,9 @@
 class VCMap {
-    constructor(directoryChart,networkGraph, networkUpdate) {
+    constructor(directoryChart,networkGraph, networkUpdate,) {
         // console.log("On construction: " + DB);
 
         this.networkUpdate = networkUpdate;
         this.networkGraph = networkGraph;
-        this.DB = new Database();
         this.directoryChart = directoryChart;
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.width = 1020 - this.margin.left - this.margin.right;
