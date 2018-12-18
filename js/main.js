@@ -112,7 +112,6 @@
         DB.processQuery(query, DB.formatLineData)
             .then(e => {
                 lineData = e;
-                console.log("Line data: " + lineData);
                 timeSelector.initiate(lineData);
             }) 
             .then(() => {

@@ -7,8 +7,8 @@ class TimeSelector {
             directoryChart : directoryChart
         };
 
-        this.margin = {top: 20, right: 20, bottom: 50, left: 100};
-        this.width = 700 - this.margin.left - this.margin.right;
+        this.margin = {top: 20, right: 100, bottom: 50, left: 200};
+        this.width = 1200 - this.margin.left - this.margin.right;
         this.height = 300 - this.margin.top - this.margin.bottom;
         this.current = '2013';
 
@@ -47,7 +47,7 @@ class TimeSelector {
                 
                 let nextAmount = data[i]['amount'];
                 // If null amount, default to 0 and continue
-                if (nextAmount!=null) {
+                if (nextAmount!="null") {
                     nextAmount = parseInt(data[i]['amount'].replace(/,/g, ''));
                 } else {
                     continue;
@@ -76,11 +76,11 @@ class TimeSelector {
     initiate(data) {
         var self = this;
         let temp = this.formatData(data);
-        console.log("temp: " + Object.keys(temp));
-        console.log("temp data: " + temp['data']);
-        for (let i=0; i <temp['data'].length; i++) {
-            console.log(temp['data'][i]);
-        }
+        // console.log("temp: " + Object.keys(temp));
+        // console.log("temp data: " + temp['data']);
+        // for (let i=0; i <temp['data'].length; i++) {
+            // console.log(temp['data'][i]);
+        // }
 
         self.years = temp['years'];
         self.data = temp['data'];
@@ -98,10 +98,6 @@ class TimeSelector {
     update() {
         var self = this;
         let len = self.data.length;
-        console.log("\n\n\nwhat gives. my data is now: ");
-        for (let i=0; i < self.data.length; i++) {
-            console.log(self.data[i]);
-        }
 
         // TODO: IMPLEMENT AS ENTER/UPDATE/EXIT INSTEAD OF REMOVING SVG
         // TODO: ADD ANIMATION
@@ -158,15 +154,22 @@ class TimeSelector {
             .attr("id", "line")
             .attr("d", line)
             .attr("stroke", "black")
-            .attr("fill", "none");
+            .attr("stroke-width", "2px")
+            .attr("fill", "none")
+            .style("stroke-linecap", "round")
+            .style("stroke-linejoin", "round");
 
           context.append("g")
               .attr("class", "axis axis--x")
               .attr("transform", "translate(0," + (self.margin.top + self.height) + ")")
-              .call(xAxis);
+              .style("font", "26px sans")
+              .call(xAxis
+                .tickFormat(d3.format("4")));;
 
           context.append("g")
-              .call(yAxis);
+                .style("font", "26px sans")
+                .call(yAxis
+                    .ticks(4));
 
           context.append("g")
               .attr("class", "brush")
