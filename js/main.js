@@ -108,7 +108,8 @@
         // });
 
         // Onload display year selector
-        query = DB.lineQuery(funding_round_type="None", catagory_code="None");
+        // query = DB.lineQuery(funding_round_type="None", catagory_code="None");
+        query = DB.lineQuery(funding_round_type=["series-a", "series-b"], catagory_code=["advertising", "web"]);
         DB.processQuery(query, DB.formatLineData)
             .then(e => {
                 lineData = e;
@@ -174,11 +175,15 @@
             let funding_round_type = d3.select('#fundingType').property('value');
             let catagory_code = d3.select('#categories').property('value');
 
-            query = DB.lineQuery(funding_round_type, catagory_code);
+            // let test_funding_round_types = ['series-a', 'series-b'];
+            // let test_catagory_code = ['advertising', 'analytics'];
+
+            query = DB.lineQuery(test_funding_round_types, test_catagory_code);
+            // query = DB.lineQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatLineData)
                 .then(e => {
                     lineData = e;
-                    console.log("new line data: " + lineData);
+                    // console.log("new line data: " + lineData);
                     timeSelector.initiate(lineData);
                 }) 
                 .then(() => {

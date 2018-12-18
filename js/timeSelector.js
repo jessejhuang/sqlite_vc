@@ -12,14 +12,34 @@ class TimeSelector {
         this.height = 300 - this.margin.top - this.margin.bottom;
         this.current = '2013';
 
+        this.lineNameToColor = new Object();
+
+        this.lineColors = ["rgb(0, 0, 0)", "rgb(1, 0, 103)", "rgb(213, 255, 0)", "rgb(255, 0, 86)", "rgb(158, 0, 142)", "rgb(14, 76, 161)", "rgb(255, 229, 2)", "rgb(0, 95, 57)", "rgb(0, 255, 0)", "rgb(149, 0, 58)", "rgb(255, 147, 126)", "rgb(164, 36, 0)", "rgb(0, 21, 68)", "rgb(145, 208, 203)", "rgb(98, 14, 0)", "rgb(107, 104, 130)", "rgb(0, 0, 255)", "rgb(0, 125, 181)", "rgb(106, 130, 108)", "rgb(0, 174, 126)", "rgb(194, 140, 159)", "rgb(190, 153, 112)", "rgb(0, 143, 156)", "rgb(95, 173, 78)", "rgb(255, 0, 0)", "rgb(255, 0, 246)", "rgb(255, 2, 157)", "rgb(104, 61, 59)", "rgb(255, 116, 163)", "rgb(150, 138, 232)", "rgb(152, 255, 82)", "rgb(167, 87, 64)", "rgb(1, 255, 254)", "rgb(255, 238, 232)", "rgb(254, 137, 0)", "rgb(189, 198, 255)", "rgb(1, 208, 255)", "rgb(187, 136, 0)", "rgb(117, 68, 177)", "rgb(165, 255, 210)", "rgb(255, 166, 254)", "rgb(119, 77, 0)", "rgb(122, 71, 130)", "rgb(38, 52, 0)", "rgb(0, 71, 84)", "rgb(67, 0, 44)", "rgb(181, 0, 255)", "rgb(255, 177, 103)", "rgb(255, 219, 102)", "rgb(144, 251, 146)", "rgb(126, 45, 210)", "rgb(189, 211, 147)", "rgb(229, 111, 254)", "rgb(222, 255, 116)", "rgb(0, 255, 120)", "rgb(0, 155, 255)", "rgb(0, 100, 1)", "rgb(0, 118, 255)", "rgb(133, 169, 0)", "rgb(0, 185, 23)", "rgb(120, 130, 49)", "rgb(0, 255, 198)", "rgb(255, 110, 65)", "rgb(232, 94, 190)"]
+
         var self = this;
         return self;
         
     }
 
+
     formatData(data) {
         data = JSON.parse(data);
+        let lineNames = Object.keys(data);
+        let formattedLines = new Object();
+        let nextLine;
 
+        for (let i=0; i < lineNames.length; i++) { 
+            // Next line: a list of dicitonaries [{year:----, amount:-----}, {year:----, amount:-----}, {year:----, amount:-----}]
+            // console.log("next data");
+            nextLine = this.formatLine(data[lineNames[i]]);
+            formattedLines[lineNames[i]] = nextLine
+        }
+
+        return(formattedLines)
+
+    }
+
+    formatLine(data) {
         var dataLength = data.length;
         let years = [];
         let temp = {};
@@ -76,15 +96,19 @@ class TimeSelector {
     initiate(data) {
         var self = this;
         let temp = this.formatData(data);
+        console.log("temp");
+        console.log(temp);
         // console.log("temp: " + Object.keys(temp));
         // console.log("temp data: " + temp['data']);
         // for (let i=0; i <temp['data'].length; i++) {
             // console.log(temp['data'][i]);
         // }
 
-        self.years = temp['years'];
-        self.data = temp['data'];
-        self.max = temp['max'];
+        self.lines = temp;
+
+        // self.years = temp['years'];
+        // self.data = temp['data'];
+        // self.max = temp['max'];
 
         // SVG
         self.svg = d3.select("#timeSelector")
@@ -97,11 +121,14 @@ class TimeSelector {
 
     update() {
         var self = this;
-        let len = self.data.length;
+        let keys = Object.keys(self.lines);
 
-        // TODO: IMPLEMENT AS ENTER/UPDATE/EXIT INSTEAD OF REMOVING SVG
-        // TODO: ADD ANIMATION
-        // TODO: FORMAT/STYLE
+        let overallMax = 0;
+        for(let i=0; i < keys.length; i++) {
+            if (overallMax < self.lines[keys[i]]['max']) {
+                overallMax = self.lines[keys[i]]['max'];
+            }
+        }
 
         // Remove old line
         d3.select("#timeSelector").html("");
@@ -137,7 +164,7 @@ class TimeSelector {
                     .range([0, this.width]); 
 
         let yScale = d3.scaleLinear()
-                    .domain([0, self.max])
+                    .domain([0, overallMax])
                     .range([this.margin.top+this.height, this.margin.top]);
 
 
@@ -149,25 +176,33 @@ class TimeSelector {
             .attr("id", "context")
             .attr("transform", "translate(" + self.margin.left + "," + self.margin.top + ")");
 
-        context.append("path")
-            .datum(self.data)
-            .attr("id", "line")
-            .attr("d", line)
-            .attr("stroke", "black")
-            .attr("stroke-width", "2px")
-            .attr("fill", "none")
-            .style("stroke-linecap", "round")
-            .style("stroke-linejoin", "round");
+        let nextData;
+        // Append lines
+        for(let i=0; i < keys.length; i++) {
+            nextData = self.lines[keys[i]]['data'];
+
+            context.append("path")
+                .datum(nextData)
+                // .attr("id", "line")
+                .attr("d", line)
+                .attr("stroke", this.lineColors[i])
+                .attr("stroke-width", "2px")
+                .attr("fill", "none")
+                .style("stroke-linecap", "round")
+                .style("stroke-linejoin", "round");
+            // UPDATE DICTIONARY WITH LINE NAME -> COLORS
+            lineNameToColor[keys[i]] = this.lineColors[i]
+        }
 
           context.append("g")
               .attr("class", "axis axis--x")
               .attr("transform", "translate(0," + (self.margin.top + self.height) + ")")
-              .style("font", "26px sans")
+              .style("font", "26px Product Sans")
               .call(xAxis
                 .tickFormat(d3.format("4")));;
 
           context.append("g")
-                .style("font", "26px sans")
+                .style("font", "26px Product Sans")
                 .call(yAxis
                     .ticks(4));
 
@@ -184,113 +219,3 @@ class TimeSelector {
     }
 
 }
-// class TimeSelector {
-
-//     constructor(directoryChart,vcMap) {
-        
-//         // this.directoryChart = directoryChart;
-        
-//         this.dependentCharts = {
-//             vcMap : vcMap,
-//             directoryChart : directoryChart
-//         };
-
-//         this.current = '1995-Q2';
-//         var self = this;
-//         return self;
-        
-//     }
-
-//     initiate(data) {
-//         var self = this;
-//         data = JSON.parse(data);
-//         d3.select('[id="current"]').html("YQ"+self.current);
-        
-//         self.xScale = d3.scaleLinear()
-//                     .domain([0, data.years.length])
-//                     .range([15,485]); 
-                    
-//         self.svg = d3.select("#timeSelector")
-//                 .append("svg")
-//                 .attr("preserveAspectRatio", "xMinYMin meet")
-//                 .attr("viewBox", "0 0 500 50");
-        
-        
-//         self.line = d3.line()
-//             .x(function(d,i){return self.xScale(i);})
-//             .y(function(){return 5;})
-//             .curve(d3.curveLinear);
-            
-//         self.lines = self.svg.append("g");
-//         self.dates = self.svg.append("g");
-//         self.group = self.svg.append("g");
-        
-//     }
-
-//     update(data) {
-//         data = JSON.parse(data);
-//         console.log("Data received: " + data.years);
-        
-//         var self = this;
-  
-//         var lines = self.lines.selectAll("path").data(data.years);
-//         lines.enter().remove();
-//         lines.enter().append("path").merge(lines)
-//             .attr("d", self.line(data.years))
-//             .attr("fill", "none")
-//             .attr("stroke", "gray")
-//             .attr("class", "link");
-
-           
-//         var dates = self.dates.selectAll("text").data(data.years);
-//         dates.exit().remove();
-//         dates.enter().append('g')
-//             .attr("transform",function(d,i) {return "translate("+self.xScale(i)+","+30+")"; })
-//             .append("text").merge(dates)
-//             .text(function(d) { return d; })
-//             .attr('id', function(d){return d;})
-//             .style('fill', 'black')
-//             .attr("class","datetext")
-//             .attr("transform", function() {
-//                 return "rotate(-60)"
-//             });
-//         //                        
-//         var group = self.group.selectAll("circle").data(data.years);
-//         group.exit().remove();
-//         group.enter().append("circle").merge(group)
-//             .attr("id",function(d) { return "YQ"+d; })
-//             .attr("cx", function(d,i){  return self.xScale(i);})
-//             .attr("cy", 5)
-//             .attr("fill",function(){
-//                return 'gray';
-//              })
-//             .attr("r", 2)
-//             .attr('fill-opacity', 1.0)
-//             .attr("stroke",'none')
-//             .attr("stroke-width",0.7)
-//             .on('mouseover',function(){d3.select(this).attr("stroke","black").attr("stroke-width",0.8);})
-//             .on('mouseout',function(){
-//                 d3.select(this).attr("stroke","none").attr("stroke-width",0);
-//                 d3.select('[id=YQ'+self.current+']').attr("stroke","black").attr("stroke-width",0.8);
-            
-//             })
-//             .on('click', function(d){
-//                 d3.select('[id=YQ'+self.current+']').attr("stroke","none").attr("stroke-width",0.8);
-//                 self.refreshMap(d);
-//                 self.current = d;
-//                 d3.select('[id=YQ'+d+']').attr("stroke","black").attr("stroke-width",0.8);
-                
-//              });
-            
-//         d3.select('[id=YQ'+self.current+']').attr("stroke","black").attr("stroke-width",0.8);  
-
-
-//     }
-//     refreshMap(year){
-//         var self = this;
-//         self.current = year;
-//         self.dependentCharts.vcMap.changeYear(year);
-//         console.log("Updating year");
-//         self.dependentCharts.directoryChart.changeYear(year);            
-//     }
-// }
