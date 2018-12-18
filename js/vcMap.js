@@ -8,6 +8,7 @@ class VCMap {
         this.width = 1020 - this.margin.left - this.margin.right;
         this.height = 550 - this.margin.top - this.margin.bottom;
         this.current = 2013;
+        this.maxYear = 2013;
         this.selectedCities = [];
 
         this.svg = d3.select("#vcMap").append("svg")
@@ -44,7 +45,7 @@ class VCMap {
                 .enter()
                     .append("path")
                         .attr("class", "state")
-                        .attr("d", stateLines)
+                        .attr("d", stateLines);
         });
         this.coords = new Promise((resolve, reject) => {
             d3.json('data/map/city_coordinates.json', (err, data) => {
@@ -55,7 +56,7 @@ class VCMap {
                     resolve(data);
                 }
             });
-        })
+        });
     }
     initialize(data){
         this.data = JSON.parse(data);
@@ -105,34 +106,79 @@ class VCMap {
                         return y;
                     })
                     .attr('r', city => {
-                        let funds = data[city][self.current];
+                        let funds = 0;
+                        let nextFunds = 0;
+                        // console.log(self.current);
+                        for (var i = self.current; i < self.maxYear+1; i++) {
+                            nextFunds = data[city][i];
+                            // console.log(nextFunds);
+                            if ( (nextFunds != 0) && (typeof(nextFunds) != "undefined") ){
+                                funds += nextFunds;
+                            }
+                        }
+
+                        // let funds = data[city][self.current];
+                        // console.log(data[city][self.current-1]);
                         if ( (funds === 0) || (typeof(funds) == "undefined") ){
                             return 0;
                         }
                         return scale(funds);
                     })
+                    // .attr('r', city => {
+                    //     let funds = data[city][self.current];
+                    //     if ( (funds === 0) || (typeof(funds) == "undefined") ){
+                    //         return 0;
+                    //     }
+                    //     return scale(funds);
+                    // })
                     .on('mouseover', city => {
-                        let funds = data[city][self.current];
+                        let funds = 0;
+                        let nextFunds = 0;
+                        for (var i = self.current; i < self.maxYear+1; i++) {
+                            nextFunds = data[city][i];
+                            if ( (nextFunds != 0) && (typeof(nextFunds) != "undefined") ){
+                                funds += nextFunds
+                            }
+                        }
+                        // let funds = data[city][self.current];
                         let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
                         self.tooltip.show(city, format_funds);
                     })
                     .on('mouseout', city => {
-                        let funds = data[city][self.current]; 
+                        // let funds = data[city][self.current]; 
+                        let funds = 0;
+                        let nextFunds = 0;
+                        for (var i = self.current; i < self.maxYear+1; i++) {
+                            nextFunds = data[city][i];
+                            if ( (nextFunds != 0) && (typeof(nextFunds) != "undefined") ){
+                                funds += nextFunds
+                            }
+                        }
                         let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
                         self.tooltip.hide(city, format_funds);
                     })
+                    // .on('mouseover', city => {
+                    //     let funds = data[city][self.current];
+                    //     let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                    //     self.tooltip.show(city, format_funds);
+                    // })
+                    // .on('mouseout', city => {
+                    //     let funds = data[city][self.current]; 
+                    //     let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                    //     self.tooltip.hide(city, format_funds);
+                    // })
                     // On click update the directory chart based on the clicked city
                     .on('click', function(city) {
                         // If the city is selected, remove it from list of selected
                         if (self.selectedCities.indexOf(city) >= 0) {
                             let spliceIndex = self.selectedCities.indexOf(city);
                             self.selectedCities.splice(spliceIndex, 1);
-                            d3.select(this).style('fill', 'rgb(217, 91, 67')
+                            d3.select(this).style('fill', 'rgb(217, 91, 67');
                         } 
                         // City is not selected. Update selected list
                         else {
                             self.selectedCities.push(city);
-                            d3.select(this).style('fill', 'rgb(255,255,51)')
+                            d3.select(this).style('fill', 'rgb(255,255,51)');
                         }
                         // Update the directory chart based on the list of selected cities
                         self.directoryChart.cities = self.selectedCities;
@@ -145,9 +191,10 @@ class VCMap {
             self.dots.selectAll(".city[cx='0']").remove();
         });
     }
-    changeYear(year){
+    changeYear(year, maxYear=2013){
         var self = this;
         self.current = year;
+        self.maxYear = maxYear;
         self.update();
         
         self.selectedCities = [];

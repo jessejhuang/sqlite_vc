@@ -6,7 +6,8 @@ class DirectoryChart {
 					this.margin = {top: 20, right: 20, bottom: 30, left: 50};
 			this.width = 350 - this.margin.left - this.margin.right;
 			this.height = 500 - this.margin.top - this.margin.bottom;
-					this.current = 2013;
+			this.current = 2013;
+			this.maxYear = 2013;
 			this.cities = []; //Updated in vcMap.js when a user clicks a dot
 			this.svg = d3.select('#org-list').append('svg')
 				.attr("width", this.width + this.margin.left + this.margin.right)

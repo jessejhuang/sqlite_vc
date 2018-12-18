@@ -1,4 +1,4 @@
-class Database{
+ class Database{
 
 	constructor(){
 		this.directoryColumns = [
@@ -13,7 +13,7 @@ class Database{
 		];
 		this.db = new Promise((resolve, reject) => {
 			d3.request('data/raw_crunchbase.db')
-			// d3.request('https://s3.amazonaws.com/raw-crunchbase-db/raw_crunchbase.db')
+			//d3.request('https://rawcrunchbasedb.blob.core.windows.net/raw/raw_crunchbase.db?sp=r&st=2018-12-16T02:31:46Z&se=2019-01-03T10:31:46Z&sip=0.0.0.0-255.255.255.255&spr=https&sv=2018-03-28&sig=ozV5CpPZKudt4iEcPs%2BsnrlRTm7feTQ0ysiuBVWh0hY%3D&sr=b')
 				.header("X-Requested-With", "XMLHttpRequest")
 				.header('Access-Control-Allow-Origin', '*')
 				.header('Access-Control-Allow-Methods' ,'GET, POST')
@@ -32,8 +32,8 @@ class Database{
 		let self = this;
 		return new Promise((resolve, reject) => {
 			self.db.then(database => {
-				console.log('Process Query: ')
-				console.log(query)
+				//console.log('Process Query: ');
+				//console.log(query);
 				let response = database.exec(query);
 				if (formatFunction){
 					resolve(formatFunction(response));
@@ -42,7 +42,7 @@ class Database{
 					resolve(response);
 				}
 			}, err => {
-				reject(err)
+				reject(err);
 			});
 		});
 	}
@@ -82,16 +82,16 @@ class Database{
 			}
 		}
 		// Grouping must align with selection
-		query += 'GROUP BY cb_objects_venture.city, year '
+		query += 'GROUP BY cb_objects_venture.city, year ';
 	
 		if(funding_round_type){
-			query += ', cb_funding_rounds.funding_round_type'
+			query += ', cb_funding_rounds.funding_round_type';
 		}
 		if(category_code){
-			query += ', cb_objects_venture.category_code '
+			query += ', cb_objects_venture.category_code ';
 		}
 		//Sort
-		query += ' ORDER BY cb_objects_venture.city, year'
+		query += ' ORDER BY cb_objects_venture.city, year';
 		if(limit){
 			query += `LIMIT ${limit}`;
 		}
@@ -103,7 +103,7 @@ class Database{
 	// Formats it into the form {"San Francisco": {"1987": 0, "1995": 0, "1996": 0...
 	formatMapData(res){
 		let data = res[0].values;
-		let cities = {}
+		let cities = {};
 		for(let element of data){
 			let city = element[0];
 			let raised = element[1];
@@ -128,12 +128,89 @@ class Database{
 		return cities;
 	}
 
+	lineQuery(funding_round_type="None", category_code="None") {
+		if (funding_round_type=="None") {
+			funding_round_type=false;
+		}
+		if (category_code=="None") { 
+			category_code=false
+		}
+
+		let query = "";
+
+		//  Nested query
+		query += "SELECT SUM(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'  \n FROM \n ("
+
+		//  Inner query
+		//  query += 'SELECT DISTINCT cb_objects_venture.name, cb_funding_rounds.funded_at, \
+				//  cb_funding_rounds.raised_amount' 
+
+		query += 'SELECT DISTINCT cb_objects_venture.name, cb_objects_venture.city, \
+				cb_funding_rounds.raised_amount, cb_funding_rounds.funded_at'
+
+		//  Joining
+		query+=	'\nFROM cb_investments \n \
+			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id \n \
+			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id \n \
+			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id'
+
+		//  Filtering
+		if (funding_round_type || category_code) {
+			query += '\nWHERE \n (cb_objects_venture.country_code=\'USA\') \n AND \n (cb_objects_venture.state_code!=\'None\')'
+		}
+
+		if (funding_round_type || category_code) {
+			query += '\n AND'
+		}
+
+		if (funding_round_type) {
+			query += '\n (cb_funding_rounds.funding_round_type=\'' + funding_round_type + '\') '
+		}
+
+		if (funding_round_type && category_code) {
+			query += '\n AND'
+		}
+
+		if (category_code) {
+			query += '\n (cb_objects_venture.category_code=\'' + category_code + '\')'
+		}
+
+		//  End nested query
+		query += '\n ) t '
+
+		//  Grouping must align with selection
+		query += '\nGROUP BY year'
+		
+		//  Sort
+		query += '\nORDER BY year' 
+
+		//  Finish
+		query += ";"
+		return(query);
+	}
+
+
+	formatLineData(res) {
+		let data = res[0].values;
+		let obj;
+		let jsonString;
+		let elements = [];
+		for(let element of data){
+			obj = new Object();
+			obj.amount  = "" + element[0];
+			obj.year = parseInt(element[1]);
+			elements.push(obj);
+		}
+		return(JSON.stringify(elements));
+	}
+
+
 	filtersQuery(field, table){
 		return `SELECT ${field} FROM ${table} GROUP BY ${field}`;
 	}
 
 	formatFilterData(res){
-		let filters = []
+		let filters = [];
 		let data = res[0].values;
 		for(let element of data){
 			filters.push(element[0]);
@@ -186,13 +263,13 @@ class Database{
 				`;
 			}
 			if(i != crunchbaseTypes.length - 1){
-				query += ' UNION '
+				query += ' UNION ';
 			}
 		}
 		if(limit){
 			query += ` LIMIT ${limit}`;
 		}
-		query += ';'
+		query += ';';
 		return query;
 	}
 
@@ -209,11 +286,13 @@ class Database{
 			'cb_funding_rounds.raised_amount_usd',
 			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
 		];
-		let entities = []
-		let data = res[0].values;
-		console.log('formatDirectoryData: ',data);
+		let entities = [];
+		let data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
 		for(let element of data){
-			let entity = {}
+			let entity = {};
 			for(let i = 0; i < element.length; i++){
 				entity[directoryColumns[i]] = element[i];
 			}
@@ -232,20 +311,20 @@ class Database{
 		}
 
 		let query = `
-			SELECT t.source, t.target, CAST(t.raised_amount as TEXT) as raised_amount FROM
-				(SELECT cb_investments.investor_object_id, cb_investments.funded_object_id,
-				 SUM(cb_funding_rounds.raised_amount) as raised_amount,
-			STRFTIME(\'%Y\', cb_funding_rounds.funded_at) as year,
-			cb_objects_vc.name as source, cb_objects_venture.name as target
-			FROM cb_investments
-			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id
-			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id
-			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id
+			SELECT t.source, t.target, CAST(t.raised_amount as TEXT) as raised_amount FROM \
+				(SELECT cb_investments.investor_object_id, cb_investments.funded_object_id, \
+				 SUM(cb_funding_rounds.raised_amount) as raised_amount, \
+			STRFTIME('%Y', cb_funding_rounds.funded_at) as year, \
+			cb_objects_vc.name as source, cb_objects_venture.name as target \
+			FROM cb_investments \
+			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id  \
+			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id  \
+			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id \
 		`;
 		if(network_type === 'city' || !network_type){
 			query += `
 				WHERE (cb_objects_venture.city IN ${cities}) AND
-				(STRFTIME(\'%Y\', cb_funding_rounds.funded_at)=\'${year}\')
+				(STRFTIME('%Y', cb_funding_rounds.funded_at)=\'${year}\')
 			`;
 		}
 		else if(network_type === 'entity'){
@@ -260,49 +339,61 @@ class Database{
 			ORDER BY raised_amount DESC) t LIMIT 40
 		`;
 		return query;
+		
 	}
 
 	formatLinkData(res){
-		console.log('format link data:', res);
-		let data = res[0].values;
+		//console.log('format link data:', res);
+		var data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
 		let links = [];
 		let rows = [];
-		for(element of data){
-			rows.push(element)
+		for(let element of data){
+			rows.push(element);
 			let formatted_row = {
 				source: element[0],
 				target: element[1],
 				amount: element[2]
 			};
-			links.append(formatted_row);
+			links.push(formatted_row);
 		}
-		console.log('format link data raw link: ', rows);
-		console.log('format link data: links: ', links);
+		//console.log('format link data raw link: ', rows);
+		//console.log('format link data: links: ', links);
 		return links;
 	}
 
 	nodeQuery(linkQuery){
 		let query = `
 			SELECT DISTINCT t.source, \"vc\" as type	
-			FROM (\'${linkQuery}\') t
+			FROM (${linkQuery}) t
 			UNION SELECT DISTINCT t.target, \"venture\" as type
-			FROM (\'${linkQuery}\') t
+			FROM (${linkQuery}) t
 			ORDER BY type
 		`;
 		return query;
 	}
 
 	formatNodeData(res){
-		let data = res[0].values;
-		nodes = [];
+		var data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
+		let nodes = [];
 		for(let element of data){
 			let formatted_row = {
 				name: element[0],
 				type: element[1]
 			};
-			nodes.append(formatted_row);
+			nodes.push(formatted_row);
 		}
-		print('Format Node Data nodes: ', nodes)
+		//console.log('Format Node Data nodes: ', nodes);
 		return nodes;
 	}
+
+	profileQuery(name){
+
+	}
+
 }

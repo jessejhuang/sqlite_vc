@@ -27,11 +27,12 @@ class NetworkGraph {
                 .strength(0.2)
                 .id(function(d){return d.name;})
                 .distance(function(){return 80;}))
-                .force("charge", d3.forceManyBody().strength(-100).distanceMax(150).distanceMin(60))
-                .force("collide", d3.forceCollide(function(){return 20;}))
+                .force("charge", d3.forceManyBody().strength(-250).distanceMax(150).distanceMin(60))
+                .force("collide", d3.forceCollide(function(){return 1;}))
                 .force("center", d3.forceCenter(this.width/2,this.height/2));
                 
-        this.simulation.alphaTarget(0.05);
+        //this.simulation.alphaDecay(0.4).alphaTarget(0.01).alphaMin(0.1);
+        this.simulation.restart().alphaDecay(0.001).alphaTarget(0.1).alphaMin(0.45).velocityDecay(0.8);
 
  
         
@@ -162,7 +163,7 @@ class NetworkGraph {
         
         function dragstarted(d) {
             
-            if (!d3.event.active) simulation.alphaTarget(1).restart();
+            if (!d3.event.active) simulation.restart().velocityDecay(0.4);
             d.fx = d.x;
             d.fy = d.y;
        
@@ -175,7 +176,7 @@ class NetworkGraph {
         }
          
         function dragended(d) {
-            if (!d3.event.active) simulation.alphaTarget(0.02);
+            if (!d3.event.active) simulation.alphaDecay(0.01).alphaTarget(0.02).alphaMin(0.01);
           
             d.fx = null;
             d.fy = null;

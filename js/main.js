@@ -10,7 +10,7 @@
 
     //Creating instances for each visualization
     let DB = new Database();
-    let profileChart = new ProfileChart();
+    let profileChart = new ProfileChart(DB);
     let directoryChart = new DirectoryChart(profileChart, DB);
     let networkGraph = new NetworkGraph(profileChart);
     // let nextChart = new NextChart();
@@ -19,21 +19,21 @@
     function networkUpdate(data){
         data = JSON.parse(data);
         let graph = {};
-        let year = data['year'];
-        let type = data['type'];
-        let cities = data['cities'];
+        let year = data.year;
+        let type = data.type;
+        let cities = data.cities;
         if(cities){
             let linkQuery = DB.linkQuery(year, cities, type);
             let linkResponse = DB.processQuery(linkQuery, DB.formatLinkData);
 
             let nodeQuery = DB.nodeQuery(linkQuery);
             let nodeResponse = DB.processQuery(nodeQuery, DB.formatNodeData);
-            console.log('link and node queries: ', linkQuery, nodeQuery)
+            //console.log('link and node queries: ', linkQuery, nodeQuery)
             Promise.all([linkResponse, nodeResponse])
                 .then(values => {
-                    console.log('node and link responses: ', values);
-                    graph['links'] = values[0];
-                    graph['nodes'] = values[1];
+                    //console.log('node and link responses: ', values);
+                    graph.links = values[0];
+                    graph.nodes = values[1];
 
                     networkData = JSON.stringify(graph);
                     networkGraph.update(networkData);
@@ -61,8 +61,12 @@
     let mapData = null;
     let timeData = null;
     let vcMap = new VCMap(directoryChart,networkGraph,networkUpdate);
+    let timeSelector= new TimeSelector(directoryChart,vcMap);
 
     function init() {
+        // let testQ = DB.lineQuery();
+        // let testRes = DB.processQuery(testQ, DB.formatLineQuery)
+        // console.log(testRes);
 
         // TODO:
         // INITIALIZE AND CREATE FORCE DIRECTED GRAPH
@@ -87,20 +91,42 @@
             }, err => {
                 console.log(err);
             });
+
+
         
         // Onload display year selector
-        d3.json('data/metadata.json', (err, data) => {
-            if(err){
+        // d3.json('data/metadata.json', (err, data) => {
+        //     if(err){
+        //         console.log(err);
+        //     }
+        //     timeData = JSON.stringify(data);
+        //     console.log("timeData:" + timeData);
+        //     let timeSelector= new TimeSelector(directoryChart,vcMap);
+        //     timeSelector.initiate(timeData);
+        //     timeSelector.refreshMap(2013);
+        //     timeSelector.update(timeData);
+        // });
+
+        // Onload display year selector
+        query = DB.lineQuery(funding_round_type="None", catagory_code="None");
+        DB.processQuery(query, DB.formatLineData)
+            .then(e => {
+                lineData = e;
+                console.log("Line data: " + lineData);
+                timeSelector.initiate(lineData);
+            }) 
+            .then(() => {
+                timeSelector.update();
+            }, err => {
                 console.log(err);
-            }
-            timeData = JSON.stringify(data);
-            let timeSelector= new TimeSelector(directoryChart,vcMap);
-            timeSelector.initiate(timeData);
-            timeSelector.refreshMap(2013);
-            timeSelector.update(timeData);
-        });
+            });
+
 
         // On load, populate filter options
+        //Prep materialize select
+        $( document ).ready(function() {
+            $('select').formSelect($('select').on('change', filterUpdates));
+        });
         // funding round types
         query = DB.filtersQuery('funding_round_type', 'cb_funding_rounds');
         DB.processQuery(query, DB.formatFilterData)
@@ -124,8 +150,12 @@
 
         // On filter, retrieve new data
         function updateMap(){
-            let funding_round_type = d3.select('#fundingType').property('value');
-            let catagory_code = d3.select('#categories').property('value');
+            //let funding_round_type = d3.select('#fundingType').property('value');
+            //let catagory_code = d3.select('#categories').property('value');
+            //let funding_round_type = d3.select('#fundingType').getSelectedValues();
+            //let catagory_code = d3.select('#categories').getSelectedValues();
+            let funding_round_type = $('#fundingType').val();
+            let catagory_code = $('#categories').val();
             let query = DB.mapQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatMapData)
                 .then(e => {
@@ -139,11 +169,37 @@
                 });
         }
 
-        d3.select('#fundingType')
-          .on('change', updateMap);
 
-        d3.select('#categories')
-          .on('change', updateMap);
+        // On filter, retrieve new data
+        function updateLine() {
+            let funding_round_type = d3.select('#fundingType').property('value');
+            let catagory_code = d3.select('#categories').property('value');
+
+            query = DB.lineQuery(funding_round_type, catagory_code);
+            DB.processQuery(query, DB.formatLineData)
+                .then(e => {
+                    lineData = e;
+                    console.log("new line data: " + lineData);
+                    timeSelector.initiate(lineData);
+                }) 
+                .then(() => {
+                    timeSelector.update();
+                }, err => {
+                    console.log(err);
+                });
+        }
+
+        function filterUpdates() {
+            updateMap();
+            updateLine();
+        }
+
+        //d3.select('#fundingType')
+        //  .on('change', filterUpdates);
+        //
+        //d3.select('#categories')
+        //  .on('change', filterUpdates);
+
 
     }
 
@@ -162,7 +218,7 @@
      * @returns {Main singleton class |*}
      */
     Main.getInstance = function(){
-        let self = this
+        let self = this;
         if(self.instance == null){
             self.instance = new Main();
 
@@ -170,7 +226,7 @@
             init();
         }
         return instance;
-    }
+    };
 
     // Wait till DB loads to initiate
     DB.db.then(() => {
