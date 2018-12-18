@@ -129,17 +129,29 @@
 	}
 
 	lineQuery(funding_round_type="None", category_code="None") {
+		let processFundingRound =true;
+		let processCategoryCode =true;
+
 		if (funding_round_type=="None") {
-			funding_round_type=false;
+			processFundingRound=false;
 		}
 		if (category_code=="None") { 
-			category_code=false
+			processCategoryCode=false;
 		}
 
 		let query = "";
 
 		//  Nested query
-		query += "SELECT SUM(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'  \n FROM \n ("
+		query += "SELECT SUM(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'"
+
+		if (processFundingRound) {
+			query += ", funding_round_type"
+		}
+		if (processCategoryCode) { 
+			query += ", category_code"
+		}
+
+		query += "\n FROM \n ("
 
 		//  Inner query
 		//  query += 'SELECT DISTINCT cb_objects_venture.name, cb_funding_rounds.funded_at, \
@@ -148,6 +160,13 @@
 		query += 'SELECT DISTINCT cb_objects_venture.name, cb_objects_venture.city, \
 				cb_funding_rounds.raised_amount, cb_funding_rounds.funded_at'
 
+		if (processFundingRound) {
+			query += ", cb_funding_rounds.funding_round_type"
+		}
+		if (processCategoryCode) { 
+			query += ", cb_objects_venture.category_code"
+		}
+
 		//  Joining
 		query+=	'\nFROM cb_investments \n \
 			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id \n \
@@ -155,24 +174,45 @@
 			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id'
 
 		//  Filtering
-		if (funding_round_type || category_code) {
+		if (processFundingRound || processCategoryCode) {
 			query += '\nWHERE \n (cb_objects_venture.country_code=\'USA\') \n AND \n (cb_objects_venture.state_code!=\'None\')'
 		}
 
-		if (funding_round_type || category_code) {
+		if (processFundingRound || processCategoryCode) {
 			query += '\n AND'
 		}
 
-		if (funding_round_type) {
-			query += '\n (cb_funding_rounds.funding_round_type=\'' + funding_round_type + '\') '
+		if (processFundingRound) {
+			query += '\n (cb_funding_rounds.funding_round_type IN (';
+
+			for (let i=0; i < funding_round_type.length; i++) {
+				query += "\'" + funding_round_type[i] + "\'"
+
+				if (i < funding_round_type.length-1) {
+					query += ','
+				}
+			}
+
+			query += '))';
 		}
 
-		if (funding_round_type && category_code) {
+		if (processFundingRound && processCategoryCode) {
 			query += '\n AND'
 		}
 
-		if (category_code) {
-			query += '\n (cb_objects_venture.category_code=\'' + category_code + '\')'
+
+		if (processCategoryCode) {
+			query += '\n (cb_objects_venture.category_code IN ('
+
+			for (let i=0; i < category_code.length; i++) {
+				query += "\'" + category_code[i] + "\'"
+
+				if (i < category_code.length-1) {
+					query += ','
+				}
+			}
+			query += '))';
+
 		}
 
 		//  End nested query
@@ -180,9 +220,25 @@
 
 		//  Grouping must align with selection
 		query += '\nGROUP BY year'
-		
+
+		if (processFundingRound) {
+			query += ", funding_round_type"
+		}
+		if (processCategoryCode) { 
+			query += ", category_code"
+		}
+
 		//  Sort
-		query += '\nORDER BY year' 
+		query += '\nORDER BY ' 
+
+		if (processFundingRound) {
+			query += "funding_round_type, ";
+		}
+		if (processCategoryCode) { 
+			query += "category_code, ";
+		}
+
+		query += ' year';
 
 		//  Finish
 		query += ";"
@@ -191,17 +247,53 @@
 
 
 	formatLineData(res) {
-		let data = res[0].values;
-		let obj;
-		let jsonString;
-		let elements = [];
-		for(let element of data){
-			obj = new Object();
-			obj.amount  = "" + element[0];
-			obj.year = parseInt(element[1]);
-			elements.push(obj);
+		// console.log("\n\n\n\n\nres");
+		// console.log(res);
+		// console.log(res['0']['columns'].length)
+		// console.log(Object.keys(res));
+		let lines = new Object();
+		let curLine = [];
+		let dataPoint;
+		let curCat;
+		let curFund;
+		let curName;
+		let nextName;
+
+		if (res['0']['columns'].length==2) { curName = "Total"; }
+		if (res['0']['columns'].length==3) { curName = res['0']['values'][0][2]; }
+		if (res['0']['columns'].length==4) { curName = res['0']['values'][0][2] + ", " + res['0']['values'][0][3]; }
+
+		// console.log(curName);
+		// Process lines one by one (1 for each funding type category type combination)
+		for (let i=0; i < res['0']['values'].length; i++) {
+			// Update current name of line being processed
+			if (res['0']['columns'].length==2) { nextName = "Total"; }
+			if (res['0']['columns'].length==3) { nextName = res['0']['values'][i][2]; }
+			if (res['0']['columns'].length==4) { nextName = res['0']['values'][i][2] + ", " + res['0']['values'][i][3]; }
+
+			// We're starting a new line
+			if ( (curName != nextName) ) {
+				// Finish up old line
+				lines[curName] = curLine;
+				curLine = [];
+				curName = nextName;
+			}
+
+			dataPoint = new Object();
+			dataPoint.amount  = "" + res['0']['values'][i][0];
+			dataPoint.year = parseInt(res['0']['values'][i][1]);
+			curLine.push(dataPoint);
+
+			// the last line
+			if (i==res['0']['values'].length-1) {
+				lines[curName] = curLine;
+			}
 		}
-		return(JSON.stringify(elements));
+
+		lines = JSON.stringify(lines)
+		// console.log(lines);
+		// return("ay")
+		return(lines);
 	}
 
 
