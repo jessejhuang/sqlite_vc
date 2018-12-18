@@ -290,6 +290,7 @@
 		let data = [];
 		if(res[0] !== undefined){
 			data = res[0].values;
+			console.log("dir data avail: " + data);
 		}
 		for(let element of data){
 			let entity = {};

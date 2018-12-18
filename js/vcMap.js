@@ -1,8 +1,10 @@
 class VCMap {
     constructor(directoryChart,networkGraph, networkUpdate) {
-        
+        // console.log("On construction: " + DB);
+
         this.networkUpdate = networkUpdate;
         this.networkGraph = networkGraph;
+        this.DB = new Database();
         this.directoryChart = directoryChart;
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.width = 1020 - this.margin.left - this.margin.right;
@@ -11,12 +13,42 @@ class VCMap {
         this.maxYear = 2013;
         this.selectedCities = [];
 
+        function zoomed(){
+          d3.select("#vcMapChart").attr("transform", d3.event.transform);
+        }  
+
+        const zoom = d3.zoom()
+            .scaleExtent([1, 40])
+            .translateExtent([[0,0], [this.width, this.height]])
+            .extent([[this.margin.left, this.margin.top], [this.margin.left+this.width, this.margin.top+this.height]])
+            .on("zoom", zoomed);
+
+
+
         this.svg = d3.select("#vcMap").append("svg")
             .attr("width", this.width + this.margin.left + this.margin.right)
             .attr("height", this.height + this.margin.top + this.margin.bottom)
             .attr("align","center")
-            .attr("id", "vcMapChart");
-        this.states = this.svg.append('g');
+            .attr("id", "vcMapChart")
+            .call(zoom);
+
+        // Define the SVG clipPath
+        this.clip = this.svg.append("defs")
+          .append("clipPath")
+            .attr("id", "rect-clip")
+          .append("rect")
+            .attr("id", "my-rect")
+            .attr("x", 0)
+            .attr("y", 0)
+            .attr("width", this.width + this.margin.left + this.margin.right)
+            .attr("height", this.height + this.margin.top + this.margin.bottom)
+            .style('stroke', 'black')
+            .style('stroke-width', '5px')
+            .style('fill-opacity', 0);
+
+
+        this.states = this.svg.append('g')
+                            .attr("clip-path", "url(#rect-clip)");
         this.dots = this.svg.append('g'); 
         this.projection = d3.geoAlbersUsa()
             .scale(1000)
@@ -24,10 +56,18 @@ class VCMap {
         this.tooltip = d3.tip()
             .attr('class', 'd3-tip')
             .direction('e')
-            .html((city, funds) => {
+            .html((city, funds, minYear, maxYear) => {
+            let funding_round_type = d3.select('#fundingType').property('value');
+            let catagory_code = d3.select('#categories').property('value');
+            if (funding_round_type=="") { funding_round_type = "All"};
+            if (catagory_code=="") { catagory_code = "All"};
+
                 let template = `
-                <h4>${city}</h4>
-                <text>$${funds}</text>
+                <h4>${city} ${minYear}-${maxYear}</h4>
+                <p>Fund type: ${funding_round_type}</p>
+                <p>Venture category: ${catagory_code}</p>
+                <p>Amount: $${funds}</p>
+                <div id='tipDiv'></div>
                 `;
                 return template;
 
@@ -45,7 +85,8 @@ class VCMap {
                 .enter()
                     .append("path")
                         .attr("class", "state")
-                        .attr("d", stateLines);
+                        .attr("d", stateLines)
+                        .style('fill', "black");
         });
         this.coords = new Promise((resolve, reject) => {
             d3.json('data/map/city_coordinates.json', (err, data) => {
@@ -65,9 +106,12 @@ class VCMap {
     update() {
         // console.log("initial data: " + Object.keys(this.data))
         let self = this;
+        const toolTipScale = d3.scaleLog()
+            .domain([10, 10000000000])
+            .range([0, 190]);
         const scale = d3.scaleLog()
-            .domain([10, 100000000])
-            .range([0, 20]);
+            .domain([10, 10000000000])
+            .range([0, 10]);
         let data = this.data;
         self.coords.then(cityCoordinates => {
             self.dots.selectAll('.city').remove();
@@ -132,6 +176,7 @@ class VCMap {
                     //     return scale(funds);
                     // })
                     .on('mouseover', city => {
+
                         let funds = 0;
                         let nextFunds = 0;
                         for (var i = self.current; i < self.maxYear+1; i++) {
@@ -142,7 +187,72 @@ class VCMap {
                         }
                         // let funds = data[city][self.current];
                         let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-                        self.tooltip.show(city, format_funds);
+                        self.tooltip.show(city, format_funds, this.current, this.maxYear);
+
+                        // Get data for summary chart
+                        // let funding_round_type = d3.select('#fundingType').property('value');
+                        // let catagory_code = d3.select('#categories').property('value');
+
+                        // let query = self.DB.lineQuery(funding_round_type, catagory_code);
+                        // self.DB.processQuery(query, self.DB.formatLineData)
+                        //     .then(e => {
+                        //         lineData = e;
+                                // console.log("new line dataaaaaaa: " + lineData);
+
+                        let tipSVG = d3.select("#tipDiv")
+                                      .append("svg")
+                                      .attr("width", 200)
+                                      .attr("height", 50);
+
+
+
+                            tipSVG.append("rect")
+                            .attr("fill", "rgb(152,255,204)")
+                            .attr("y", 10)
+                            .attr("width", 0)
+                            .attr("height", 30)
+                            .transition()
+                            .duration(500)
+                            .attr("width", toolTipScale(funds));
+
+                                // for (let k = 0; k < lineData.length; k++) {
+                                //     tipSVG.append("rect")
+                                //     .attr("fill", "steelblue")
+                                //     .attr("y", k*10)
+                                //     .attr("width", 0)
+                                //     .attr("height", 30)
+                                //     .transition()
+                                //     .duration(500)
+                                //     .attr("width", k * 6);
+                                // }
+
+                                    // if (element[0] === 'USA'){
+                                    //     let lat = element[1];
+                                    //     let lon = element[2];
+                                    //     x = self.projection([lon, lat])[0];
+                                    // }
+                             
+
+
+                                                // tipSVG.append("rect")
+                                                // .attr("fill", "steelblue")
+                                                // .attr("y", 10)
+                                                // .attr("width", 0)
+                                                // .attr("height", 30)
+                                                // .transition()
+                                                // .duration(1000)
+                                                // .attr("width", 3 * 6);
+
+                                            // tipSVG.append("text")
+                                            //   .text("ay")
+                                            //   .attr("x", 10)
+                                            //   .attr("y", 30)
+                                            //   .transition()
+                                            //   .duration(1000)
+                                            //   .attr("x", 6 + 3 * 6)
+                                // timeSelector.initiate(lineData);
+                            // });
+
                     })
                     .on('mouseout', city => {
                         // let funds = data[city][self.current]; 
@@ -178,7 +288,7 @@ class VCMap {
                         // City is not selected. Update selected list
                         else {
                             self.selectedCities.push(city);
-                            d3.select(this).style('fill', 'rgb(255,255,51)');
+                            d3.select(this).style('fill', 'rgb(152,255,204)');
                         }
                         // Update the directory chart based on the list of selected cities
                         self.directoryChart.cities = self.selectedCities;
@@ -186,8 +296,8 @@ class VCMap {
                         let networkParams = {"year":self.current,"type":"city","cities":self.selectedCities};
                         self.networkUpdate(JSON.stringify(networkParams));
                     })
-                    .style('fill', 'rgb(217,91,67)')	
-                    .style('opacity', 0.85);
+                    .style('fill', "rgb(152,255,204)")	
+                    .style('opacity', 1);
             self.dots.selectAll(".city[cx='0']").remove();
         });
     }
