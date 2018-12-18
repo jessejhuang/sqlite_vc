@@ -9,6 +9,7 @@
     //Prep materialize
     $( document ).ready(function() {
         M.AutoInit();
+        
     });
     
     
@@ -88,7 +89,7 @@
         directoryChart.initialize();
 
         // Onload display map data without filters
-        let query = DB.mapQuery();
+        let query = DB.mapQuery(["total"],["total"]);
         DB.processQuery(query, DB.formatMapData)
             .then(e => {
                 mapData = JSON.stringify(e);
@@ -115,45 +116,49 @@
         //     timeSelector.update(timeData);
         // });
 
-        // Onload display year selector
-        // query = DB.lineQuery(funding_round_type="None", catagory_code="None");
-        query = DB.lineQuery(funding_round_type=["series-a", "series-b"], catagory_code=["advertising", "web"]);
-        DB.processQuery(query, DB.formatLineData)
-            .then(e => {
-                lineData = e;
-                timeSelector.initiate(lineData);
-            }) 
-            .then(() => {
-                timeSelector.update();
-            }, err => {
-                console.log(err);
-            });
-
-
-        // On load, populate filter options
+         //Onload display year selector
+        //query = DB.lineQuery(funding_round_type=["total"], catagory_code=["total"]);
+        ////query = DB.lineQuery(funding_round_type=["series-a", "series-b"], catagory_code=["advertising", "web"]);
+        //DB.processQuery(query, DB.formatLineData)
+        //    .then(e => {
+        //        lineData = e;
+        //        timeSelector.initiate(lineData);
+        //    }) 
+        //    .then(() => {
+        //        timeSelector.update();
+        //    }, err => {
+        //        console.log(err);
+        //    });
         
-        // funding round types
-        query = DB.filtersQuery('funding_round_type', 'cb_funding_rounds');
-        DB.processQuery(query, DB.formatFilterData)
-            .then(e => {
-                let funding_round_types = JSON.parse(JSON.stringify(e)).sort();
-                // from helpers.js
-                populateDropdown("fundingType", funding_round_types, defaultValue="total", defaultText="total");
-                $('select').formSelect($('select').on('change', filterUpdates));
-            }, err => {
-                console.log(err);
-            });
-
-        // category types
-        query = DB.filtersQuery('category_code', 'cb_objects');
-        DB.processQuery(query, DB.formatFilterData)
-            .then(e => {
-                let categories = JSON.parse(JSON.stringify(e)).sort();
-                populateDropdown("categories", categories, defaultValue="total", defaultText="total");
-                $('select').formSelect($('select').on('change', filterUpdates));
-            }, err => {
-                console.log(err);
-            });
+        
+        // On load, populate filter options
+        //let filterWorker = function(){
+            
+            //// funding round types
+            //query = DB.filtersQuery('funding_round_type', 'cb_funding_rounds');
+            //DB.processQuery(query, DB.formatFilterData)
+            //    .then(e => {
+            //        let funding_round_types = JSON.parse(JSON.stringify(e)).sort();
+            //        // from helpers.js
+            //        populateDropdown("fundingType", funding_round_types, defaultValue="total", defaultText="total");
+            //        $('select').formSelect($('select').on('change', filterUpdates));
+            //        
+            //    }, err => {
+            //        console.log(err);
+            //    });
+            //
+            //// category types
+            //query = DB.filtersQuery('category_code', 'cb_objects');
+            //DB.processQuery(query, DB.formatFilterData)
+            //    .then(e => {
+            //        let categories = JSON.parse(JSON.stringify(e)).sort();
+            //        populateDropdown("categories", categories, defaultValue="total", defaultText="total");
+            //        $('select').formSelect($('select').on('change', filterUpdates));
+            //        
+            //    }, err => {
+            //        console.log(err);
+            //    });
+        //};
 
         // On filter, retrieve new data
         function updateMap(){
@@ -161,13 +166,13 @@
             var f_instance = M.FormSelect.getInstance($('#fundingType'));
             var c_instance = M.FormSelect.getInstance($('#categories'));
 
-            let funding_round_type = f_instance.getSelectedValues();
-            let catagory_code = c_instance.getSelectedValues();
+            let funding_round_types = f_instance.getSelectedValues();
+            let catagory_codes = c_instance.getSelectedValues();
             
-            console.log("funding types: ", funding_round_type);
-            console.log("catagory types: ", catagory_code);
+            console.log("funding types: ", funding_round_types);
+            console.log("catagory types: ", catagory_codes);
             
-            let query = DB.mapQuery(funding_round_type, catagory_code);
+            let query = DB.mapQuery(funding_round_types, catagory_codes);
             DB.processQuery(query, DB.formatMapData)
                 .then(e => {
                     mapData = JSON.stringify(e);
@@ -187,16 +192,16 @@
             var f_instance = M.FormSelect.getInstance($('#fundingType'));
             var c_instance = M.FormSelect.getInstance($('#categories'));
 
-            let funding_round_type = f_instance.getSelectedValues();
-            let catagory_code = c_instance.getSelectedValues();
+            let funding_round_types = f_instance.getSelectedValues();
+            let catagory_codes= c_instance.getSelectedValues();
             
-            console.log("funding types: ", funding_round_type);
-            console.log("catagory types: ", catagory_code);
+            console.log("funding types: ", funding_round_types);
+            console.log("catagory types: ", catagory_codes);
 
             // let test_funding_round_types = ['series-a', 'series-b'];
             // let test_catagory_code = ['advertising', 'analytics'];
 
-            query = DB.lineQuery(test_funding_round_types, test_catagory_code);
+            query = DB.lineQuery(funding_round_types, catagory_codes);
             // query = DB.lineQuery(funding_round_type, catagory_code);
             DB.processQuery(query, DB.formatLineData)
                 .then(e => {
@@ -212,10 +217,14 @@
         }
 
         function filterUpdates() {
+            console.log("Filter Updates");
             updateMap();
             updateLine();
         }
-
+        
+        //Promise.all([filterWorker]).then(()=>{filterUpdates();});
+        $('select').formSelect($('select').on('change', filterUpdates));  
+        filterUpdates();
         //d3.select('#fundingType')
         //  .on('change', filterUpdates);
         //
@@ -246,6 +255,7 @@
 
             //called only once when the class is initialized
             init();
+            
         }
         return instance;
     };

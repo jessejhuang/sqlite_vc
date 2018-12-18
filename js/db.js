@@ -49,6 +49,28 @@
 
 	mapQuery(funding_round_type, category_code, limit){
 		// Always select these fields
+  
+  if(funding_round_type.length == 1){
+			funding_round_type = `IN (\'${funding_round_type[0]}\')`;
+		} else{
+			funding_round_type = funding_round_type.map(round => `\'${round}\'`);
+			funding_round_type = `IN (${funding_round_type.join(', ')})`;
+		}
+  
+  if(category_code.length == 1){
+			category_code = `IN (\'${category_code[0]}\')`;
+		} else{
+			category_code = category_code.map(code => `\'${code}\'`);
+			category_code = `IN (${category_code.join(', ')})`;
+		}
+  
+  if (funding_round_type==="IN ('total')") {
+			funding_round_type = 'IS NOT NULL';
+		}
+		if (category_code==="IN ('total')") { 
+			category_code = 'IS NOT NULL';
+		}
+  
 		let query = `
 			SELECT
 				cb_objects_venture.city,
@@ -72,13 +94,13 @@
 		if(funding_round_type || category_code){
 			query += 'WHERE ';
 			if(funding_round_type){
-				query += `(cb_funding_rounds.funding_round_type='${funding_round_type}') `;
+				query += `(cb_funding_rounds.funding_round_type ${funding_round_type}) `;
 			}
 			if(funding_round_type && category_code){
 				query += 'AND ';
 			}
 			if(category_code){
-				query += ` (cb_objects_venture.category_code='${category_code}') `;
+				query += ` (cb_objects_venture.category_code ${category_code}) `;
 			}
 		}
 		// Grouping must align with selection
@@ -96,6 +118,7 @@
 			query += `LIMIT ${limit}`;
 		}
 		query += ';';
+  
 		return query;
 	}
 
@@ -128,14 +151,18 @@
 		return cities;
 	}
 
-	lineQuery(funding_round_type="None", category_code="None") {
+	lineQuery(funding_round_type=['total'], category_code=['total']) {
+  
+  console.log(funding_round_type);
+  console.log(category_code);
+  
 		let processFundingRound =true;
 		let processCategoryCode =true;
 
-		if (funding_round_type=="None") {
+		if (funding_round_type===["total"]) {
 			processFundingRound=false;
 		}
-		if (category_code=="None") { 
+		if (category_code===["total"]) { 
 			processCategoryCode=false;
 		}
 
@@ -241,7 +268,8 @@
 		query += ' year';
 
 		//  Finish
-		query += ";"
+		query += ";";
+  console.log(query);
 		return(query);
 	}
 
