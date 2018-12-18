@@ -19,11 +19,12 @@
     function networkUpdate(data){
         data = JSON.parse(data);
         let graph = {};
-        let year = data.year;
+        let yearMin = data.yearMin;
+        let yearMax = data.yearMax;
         let type = data.type;
         let cities = data.cities;
         if(cities){
-            let linkQuery = DB.linkQuery(year, cities, type);
+            let linkQuery = DB.linkQuery(yearMin, yearMax, cities, type);
             let linkResponse = DB.processQuery(linkQuery, DB.formatLinkData);
 
             let nodeQuery = DB.nodeQuery(linkQuery);
