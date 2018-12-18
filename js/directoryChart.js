@@ -48,7 +48,7 @@ class DirectoryChart {
 								.attr('x', 0)
 								.attr('dy', 20)
 								.on('click', d => {
-									self.profileChart.directoryUpdate(d);
+									self.profileChart.update(d.name);
 								})
 								.style('fill', d => {
 									if(d.entity_type === 'Company'){

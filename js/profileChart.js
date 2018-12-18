@@ -13,6 +13,10 @@ class ProfileChart {
         this.initiate();
     }
 
+    numberWithCommas(x) {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    }
+
     initiate() {
         let self = this;
         self.svg.append('svg:image')
@@ -87,47 +91,24 @@ class ProfileChart {
             .attr('y', `${self.y1}%`)
             .style('font-size', '20px');
         self.y1 += 5;
-
-        self.svg.append('text')
-            .text('Funding Year: 2013')
-            .attr('id', 'profileFundingYear')
-            .attr('x', '35%')
-            .attr('y', `${self.y2}%`)
-            .style('font-size', '20px');
-        self.y2 += 5;
-        self.svg.append('text')
-            .text('Amount Raised: $0')
-            .attr('id', 'profileFunding')
-            .attr('x', '35%')
-            .attr('y', `${self.y2}%`)
-            .style('font-size', '20px');
-        self.y2 += 5;
-        self.svg.append('text')
-            .text('Funding Type: Grant')
-            .attr('id', 'profileFundingType')
-            .attr('x', '35%')
-            .attr('y', `${self.y2}%`)
-            .style('font-size', '20px');
-        self.y2 += 5;
     }
 
-    directoryUpdate(data){
+    draw(data){
+        console.log('draw: ',data);
         let self = this;
-        let query = self.db.profileQuery(data.name);
-        self.db.processQuery(query, self.db.formatProfileData);
         let companyType = data.entity_type === 'FinancialOrg' ? 'VC Firm' : 'Venture'
-        let logo = data.logo_url ? data.logo_url : 'static/images/default_logo.jpg';
+        let logo = data.logo_url ? data.logo_url : 'images/default_logo.jpg';
         let homepage = data.homepage_url ? data.homepage_url : 'https://www.pixar.com/404';
         let description = data.description ? data.description : data.short_description;
         let status = data['cb_objects.status'];
 
-        let year = data['YEAR(cb_funding_rounds.funded_at)'];
-        let yearFounded = data['YEAR(founded_at)'] ? data['YEAR(founded_at)'] : 'Unknown';
-        let firstYear = data['YEAR(first_funding_at)'] ? data['YEAR(first_funding_at)'] : year;
-        let lastYear = data['YEAR(last_funding_at)'] ? data['YEAR(last_funding_at)'] : year;
+        let year = data['cb_funding_rounds.funded_at'];
+        let yearFounded = data['founded_at'] ? data['founded_at'] : 'Unknown';
+        let firstYear = data['first_funding_at'] ? data['first_funding_at'] : year;
+        let lastYear = data['last_funding_at'] ? data['last_funding_at'] : year;
 
-        let totalFunding = data['FORMAT(funding_total_usd, 0)']
-            ? `${data['FORMAT(funding_total_usd, 0)']}`
+        let totalFunding = data.funding_total_usd
+            ? data.funding_total_usd
             : '0';
         let fundingType = data['cb_funding_rounds.funding_round_type']
             ? data['cb_funding_rounds.funding_round_type'] !== 'other'
@@ -135,7 +116,7 @@ class ProfileChart {
                 : 'Funding Type: Wildcard'
             : 'Funding Type: N/A'
         
-        let funding = data['FORMAT(cb_funding_rounds.raised_amount_usd, 0)'];
+        let funding = data['cb_funding_rounds.raised_amount_usd'];
 
         d3.select('#profileLogo')
             .attr('xlink:href', logo);
@@ -156,27 +137,41 @@ class ProfileChart {
         
         if(companyType === 'Venture'){
             d3.select('#profileTotalFunding')
-                .text(`Total Raised: $${totalFunding}`);
+                .text(`Total Raised: $${self.numberWithCommas(totalFunding)}`);
             d3.select('#profileFirstFunded')
                 .text(`First Funded: ${firstYear}`);
             d3.select('#profileLastFunded')
                 .text(`Last Funded: ${lastYear}`);
             funding = funding ? funding : totalFunding;
-            d3.select('#profileFunding')
-                .text(`Amount Raised: $${funding}`);
         }
         else{
             d3.select('#profileTotalFunding').text('');
             d3.select('#profileFirstFunded').text('');
             d3.select('#profileLastFunded').text('');
-            d3.select('#profileFunding')
-                .text(`Amount Invested: $${funding}`);
         }
-        d3.select('#profileFundingType')
-            .text(fundingType);
     }
 
-    update(data) {
+    summary(data){
+
     }
+
+    line(history){
+        
+    }
+
+    update(name) {
+        let self = this;
+        let query = self.db.profileQuery(name);
+        self.db.processQuery(query, self.db.formatProfileData)
+            .then(data => {
+                self.draw(data)
+                self.summary(data);
+                let history = data.history;
+                self.line(history);
+            }, err => {
+                console.log(err);
+            });
+    }
+
 }
 // EOF
