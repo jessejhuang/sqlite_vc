@@ -21,11 +21,14 @@
                 <div class="row">
                     <div class="col s3">
                         <ul>
+                            <li>
                             <label for= "fundingType">Fund Type Select</label>
                             <select multiple required id = "fundingType"></select>
-                        <ul>
+                            </li>
+                            <li>
                             <label for="categories">Category Select</label>
                             <select multiple required id = "categories"></select>
+                            </li>
                         </ul> 
                     </div>
                     
@@ -34,19 +37,27 @@
                         </div>
                     </div>
                 </div>
-
-                <div id="timeSelector"></div>
-                <br>
-
-                <div id="directory" class="sideBar">
-                    <h3>Organizations</h3>
-                    <div id="org-list"></div>
+                <div class="row">
+                    <div class="col s9 offset-s3">
+                        <div id="vcMap" ></div>
+                    </div>
                 </div>
                 
+                <div class="row">
+                    <div class="col s3">
+                        <h3>Organizations</h3>
+                        <div id="directory">
+                            <div id="org-list"></div>
+                        </div>
+                    </div>
+                    <div class="col s9">
+                         <div id="networkGraph"></div>
+                    </div>
+                </div>
 
-                <div id="vcMap" class="map"></div>
+                
 
-                <div id="networkGraph"></div>
+               
 
 
                 
