@@ -1,0 +1,12 @@
+Wish list
+Eliminate pre 2000 X
+Brushing for timeline X
+Filterable summary line chart X
+Process book
+Vis div'ing and styling towards "website" -- Jack starting
+Network features -- Different Shapes, Edge Weight, IPO/Acquired/Closed coloring - John starting
+Summary stats in city hover -- Jack pending
+
+Little charts in profiles 
+In profiles, links to related profiles
+Transitions for play
