@@ -27,12 +27,14 @@ class NetworkGraph {
                 .strength(0.2)
                 .id(function(d){return d.name;})
                 .distance(function(){return 80;}))
-                .force("charge", d3.forceManyBody().strength(-250).distanceMax(150).distanceMin(60))
-                .force("collide", d3.forceCollide(function(){return 1;}))
-                .force("center", d3.forceCenter(this.width/2,this.height/2));
+                .force("charge", d3.forceManyBody().strength(-250).distanceMax(200).distanceMin(60))
+                .force("collide", d3.forceCollide(function(){return 5;}))
+                .force("center", d3.forceCenter(this.width/2,this.height/2))
+                .force("x", d3.forceX().strength(0.005))
+                .force("y", d3.forceY().strength(0.005));
                 
         //this.simulation.alphaDecay(0.4).alphaTarget(0.01).alphaMin(0.1);
-        this.simulation.restart().alphaDecay(0.001).alphaTarget(0.1).alphaMin(0.45).velocityDecay(0.8);
+        this.simulation.restart().alpha(1).alphaDecay(0.01).alphaTarget(0.29).alphaMin(0.3).velocityDecay(0.6);
 
  
         
@@ -40,7 +42,7 @@ class NetworkGraph {
     
     update(data) {
         var self = this;
-        console.log('network graph update: ', data)
+        console.log('network graph update: ', data);
         
         self.data = JSON.parse(data);
         self.updateProfile();
@@ -69,7 +71,8 @@ class NetworkGraph {
         
         simulation.force("link")
             .links(graph.links);
-   
+        
+        simulation.restart().alpha(1);
    
         var link = svg.append("g")
             .attr("class", "links")
@@ -110,22 +113,22 @@ class NetworkGraph {
             .on("drag", dragged)
             .on("end", dragended));
             
-        node
-            .enter().append("title")
-            .text(function(d) {return d.title;});
+        //node
+        //    .enter().append("title")
+        //    .text(function(d) {return d.title;});
             
     
         
         //// maybe do city centroids
-        var centroid = svg.append('g')
-            .attr("class", "centroid")
+        var label = svg.append('g')
+            .attr("class", "label")
             .selectAll("text")
             .data(graph.nodes)
             .enter().append("text")
             .text(function(d){return d.name;})
             .attr("dx", 0)
             .attr("dy", 5)
-            .attr("font-size", "1vh")
+            .attr("font-size", "1.5vh")
             .attr("text-anchor", "middle")
             .attr("fill", function() {
             return "black";
@@ -151,7 +154,7 @@ class NetworkGraph {
                 .attr("cx", function(d) {return Math.max(d.r, Math.min(width - d.r, d.x));})
                 .attr("cy", function(d) {return Math.max(d.r, Math.min(height - d.r, d.y));});
                 
-            centroid
+            label
             
                 .attr("x", function(d) {return Math.max(d.r, Math.min(width - d.r, d.x));})
                 .attr("y", function(d) {return Math.max(d.r, Math.min(height - d.r, d.y));});
@@ -163,7 +166,7 @@ class NetworkGraph {
         
         function dragstarted(d) {
             
-            if (!d3.event.active) simulation.restart().velocityDecay(0.4);
+            if (!d3.event.active) simulation.restart().alphaTarget(1);
             d.fx = d.x;
             d.fy = d.y;
        
@@ -176,7 +179,7 @@ class NetworkGraph {
         }
          
         function dragended(d) {
-            if (!d3.event.active) simulation.alphaDecay(0.01).alphaTarget(0.02).alphaMin(0.01);
+            if (!d3.event.active) simulation.alphaDecay(0.01).alphaTarget(0.01).alphaMin(0.01);
           
             d.fx = null;
             d.fy = null;
