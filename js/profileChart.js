@@ -1,6 +1,7 @@
 class ProfileChart {
 
-    constructor() {
+    constructor(DB) {
+        this.DB = DB;
         this.height = 550;
         this.svg = d3.select('#profileChart').append('svg')
             .attr('width', '100%')
@@ -173,9 +174,7 @@ class ProfileChart {
             .text(fundingType);
     }
 
-    update(data) {
-        console.log(data);
-        
+    update(name) {
     }
 }
 // EOF

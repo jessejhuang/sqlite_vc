@@ -26,83 +26,42 @@ class DirectoryChart {
 
     // Called when a user clicks on a circle
     update() {
-		let self = this;
-		d3.select('#directoryChart').selectAll('tspan').remove();
-    	// Get info for entities filtered by:
-    	// Selected cities, selected category, selected funding type, selected year
-    	let fundingType = d3.select('#fundingType').property('value');
-    	let category = d3.select('#categories').property('value');
+			let self = this;
+			d3.select('#directoryChart').selectAll('tspan').remove();
+				// Get info for entities filtered by:
+				// Selected cities, selected category, selected funding type, selected year
+				let fundingType = d3.select('#fundingType').property('value');
+				let category = d3.select('#categories').property('value');
 
-    	// let query = {"year": this.current,
-    	// 		"fundingType": fundingType,
-    	// 		"category": category,
-    	// 		"cities": this.cities};
-
-
-		// Update directory chart if cities are selected
-		let query = self.DB.directoryQuery(self.current, self.cities, fundingType, category, undefined);
-		if(self.cities.length !== 0){
-			self.DB.processQuery(query, self.DB.formatDirectoryData)
-				.then(e => {
-					let directoryData = JSON.parse(JSON.stringify(e)).sort();
-					self.svg.attr('height', d3.max([500, directoryData.length * 20]));
-					d3.select('#directoryChart').selectAll('tspan')
-						.data(directoryData)
-						.enter()
-						.append('tspan')
-							.text(d => `${d.name}`)
-							.attr('x', 0)
-							.attr('dy', 20)
-							.on('click', d => {
-								self.profileChart.directoryUpdate(d);
-							})
-							.style('fill', d => {
-								if(d.entity_type === 'Company'){
-									return '#d9e4f3';
-								}
-								else{
-									return '#93bad7';
-								}
-							});
-				}, err => {
-					console.log(err);
-				})
-		}
-    	// if (self.cities.length!=0) {
-	    //     $.ajax({
-	    //         type: 'POST',
-	    //         contentType: 'application/json',
-	    //         data: JSON.stringify(query),
-	    //         dataType: 'json',
-	    //         url: 'directory',
-	    //         success: function (e) {
-	    //             let directoryData = JSON.parse(JSON.stringify(e)).sort();
-		// 			self.svg.attr('height', d3.max([500, directoryData.length * 20]));
-		// 			d3.select('#directoryChart').selectAll('tspan')
-		// 				.data(directoryData)
-		// 				.enter()
-		// 				.append('tspan')
-		// 					.text(d => `${d.name}`)
-		// 					.attr('x', 0)
-		// 					.attr('dy', 20)
-		// 					.on('click', d => {
-		// 						self.profileChart.directoryUpdate(d);
-		// 					})
-		// 					.style('fill', d => {
-		// 						console.log(d)
-		// 						if(d.entity_type === 'Company'){
-		// 							return '#d9e4f3';
-		// 						}
-		// 						else{
-		// 							return '#93bad7';
-		// 						}
-		// 					})
-	    //         },
-	    //         error: function(error) {
-	    //             console.log(error);
-	    //         }
-	    //     });
-		// }
+			// Update directory chart if cities are selected
+			let query = self.DB.directoryQuery(self.current, self.cities, fundingType, category, undefined);
+			if(self.cities.length !== 0){
+				self.DB.processQuery(query, self.DB.formatDirectoryData)
+					.then(e => {
+						let directoryData = JSON.parse(JSON.stringify(e)).sort();
+						self.svg.attr('height', d3.max([500, directoryData.length * 20]));
+						d3.select('#directoryChart').selectAll('tspan')
+							.data(directoryData)
+							.enter()
+							.append('tspan')
+								.text(d => `${d.name}`)
+								.attr('x', 0)
+								.attr('dy', 20)
+								.on('click', d => {
+									self.profileChart.directoryUpdate(d);
+								})
+								.style('fill', d => {
+									if(d.entity_type === 'Company'){
+										return '#d9e4f3';
+									}
+									else{
+										return '#93bad7';
+									}
+								});
+					}, err => {
+						console.log(err);
+					})
+			}
     }
 
     // Called when the user clicks the timeline

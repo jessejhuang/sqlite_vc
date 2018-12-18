@@ -299,6 +299,7 @@
 			}
 			entities.push(entity);
 		}
+		console.log('entities: ', entities)
 		return entities;
 	}
 
@@ -391,4 +392,9 @@
 		//console.log('Format Node Data nodes: ', nodes);
 		return nodes;
 	}
+
+	profileQuery(name){
+
+	}
+
 }
