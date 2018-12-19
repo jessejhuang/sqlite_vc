@@ -126,7 +126,8 @@
 		//Sort
 		query += ' ORDER BY cb_objects_venture.city, year';
 		query += ';';
-  //console.log(query);
+		console.log("map query")
+  		console.log(query);
 		return query;
 	}
 
@@ -290,15 +291,17 @@
 
 		//  Finish
 		query += ";";
+		console.log("Line query")
+		console.log(query);
 		return(query);
 	}
 
 
 	formatLineData(res) {
-		// console.log("\n\n\n\n\nres");
-		// console.log(res);
-		// console.log(res['0']['columns'].length)
-		// console.log(Object.keys(res));
+		console.log("\n\n\n\n\nres");
+		console.log(res);
+		console.log(res['0']['columns'].length)
+		console.log(Object.keys(res));
 		let lines = new Object();
 		let curLine = [];
 		let dataPoint;
