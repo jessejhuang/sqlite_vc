@@ -53,8 +53,8 @@ class DirectoryChart {
 			console.log(self.cities);
 
 			// Remove old table
-			$("#transaction-list thead").remove();
-			$("#transaction-list tr").remove();
+			//$("#transaction-list thead").remove();
+			//$("#transaction-list tr").remove();
 
 			let query = self.DB.directoryQuery(years, self.cities, funding_round_types, catagory_codes);
 			if(self.cities.length !== 0){
