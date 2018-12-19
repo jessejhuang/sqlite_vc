@@ -89,8 +89,8 @@ class DirectoryChart {
 							markup = `
 								<tr>	
 									<td>${directoryData[i]['Funded at']}										 </td>
-									<td id="${entityId}">${directoryData[i]['Funded entity']}</td>
-									<td id="${investorId}">${directoryData[i]['Investor']}	 </td>
+									<td id="${entityId}"><a href='#!'>${directoryData[i]['Funded entity']}</a></td>
+									<td id="${investorId}"><a href='#!'>${directoryData[i]['Investor']}	</a></td>
 									<td>${raisedAmount}								 											 </td>
 									<td>${directoryData[i]['Category']}											 </td>
 									<td>${directoryData[i]['Funding round']}							   </td>
