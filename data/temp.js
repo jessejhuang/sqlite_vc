@@ -1,120 +1,126 @@
-function lineQuery(funding_round_type="None", category_code="None") {
-		let processFundingRound =true;
-		let processCategoryCode =true;
+directoryColumns = [
+			'name', 'entity_type', 'homepage_url', 'logo_url', 'city',
+			'description', 'short_description', 'overview',
+			'cb_objects.id', 'cb_objects.status',
+			'founded_at', 'cb_funding_rounds.funded_at',
+			'first_funding_at', 'last_funding_at',
+			'funding_total_usd', 
+			'cb_funding_rounds.raised_amount_usd',
+			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
+		];
 
-		if (funding_round_type=="None") {
-			processFundingRound=false;
-		}
-		if (category_code=="None") { 
-			processCategoryCode=false;
-		}
+// SELECT funded_at, funded_object.name, investor_object.name, funded_object.category_code, cb_funding_rounds.raised_amount_usd, funded_object.state_code, funded_object.city, cb_funding_rounds.funding_round_type
+// FROM cb_investments
+// INNER JOIN cb_funding_rounds on cb_investments.funding_round_id=cb_funding_rounds.id
+// INNER JOIN cb_objects as funded_object on cb_investments.funded_object_id=funded_object.id
+// INNER JOIN cb_objects as investor_object on cb_investments.investor_object_id=investor_object.id
+// WHERE 
+// (funded_object.country_code=="USA")
+// AND
+// (STRFTIME('%Y', cb_funding_rounds.funded_at) in ('2012', '2013'))
+// AND
+// (funded_object.category_code in ('advertising'))
+// AND
+// (cb_funding_rounds.funding_round_type in ('series-a'))
+// AND
+// (funded_object.city in ('San Francisco'))
 
-		let query = "";
 
-		//  Nested query
-		query += "SELECT SUM(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'"
+function directoryQuery(years, cities, funding_round_types, category_codes){
+	let query = '';
+	query += 'SELECT funded_at, funded_object.name, investor_object.name, funded_object.category_code, cb_funding_rounds.raised_amount_usd, funded_object.state_code, funded_object.city, cb_funding_rounds.funding_round_type'
+	
+	// Join necessary tables
+	query += "\nFROM cb_investments"
+	query += '\nINNER JOIN cb_funding_rounds on cb_investments.funding_round_id=cb_funding_rounds.id'
+	query += '\nINNER JOIN cb_objects as funded_object on cb_investments.funded_object_id=funded_object.id'
+	query += '\nINNER JOIN cb_objects as investor_object on cb_investments.investor_object_id=investor_object.id'
 
-		if (processFundingRound) {
-			query += ", funding_round_type"
-		}
-		if (processCategoryCode) { 
-			query += ", category_code"
-		}
+	// Filters
+	query += "\nWHERE\n(funded_object.country_code==\"USA\")"
 
-		query += "\n FROM \n ("
+	// Years
+	if (years.length>0) {
+		query += "\nAND\nSTRFTIME('%Y', cb_funding_rounds.funded_at) in ("
 
-		//  Inner query
-		//  query += 'SELECT DISTINCT cb_objects_venture.name, cb_funding_rounds.funded_at, \
-				//  cb_funding_rounds.raised_amount' 
-
-		query += 'SELECT DISTINCT cb_objects_venture.name, cb_objects_venture.city, \
-				cb_funding_rounds.raised_amount, cb_funding_rounds.funded_at'
-
-		if (processFundingRound) {
-			query += ", cb_funding_rounds.funding_round_type"
-		}
-		if (processCategoryCode) { 
-			query += ", cb_objects_venture.category_code"
-		}
-
-		//  Joining
-		query+=	'\nFROM cb_investments \n \
-			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id \n \
-			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id \n \
-			INNER JOIN cb_objects as cb_objects_vc ON cb_investments.investor_object_id=cb_objects_vc.id'
-
-		//  Filtering
-		if (processFundingRound || processCategoryCode) {
-			query += '\nWHERE \n (cb_objects_venture.country_code=\'USA\') \n AND \n (cb_objects_venture.state_code!=\'None\')'
-		}
-
-		if (processFundingRound || processCategoryCode) {
-			query += '\n AND'
-		}
-
-		if (processFundingRound) {
-			query += '\n (cb_funding_rounds.funding_round_type IN (';
-
-			for (let i=0; i < funding_round_type.length; i++) {
-				query += "\'" + funding_round_type[i] + "\'"
-
-				if (i < funding_round_type.length-1) {
-					query += ','
-				}
+		for (let i=0; i < years.length; i++) {
+			query += "\'" + years[i] + "\'"
+			if (i < years.length-1) {
+				query += ", "
 			}
-
-			query += '))';
 		}
+		query += ")"
+	}
 
-		if (processFundingRound && processCategoryCode) {
-			query += '\n AND'
-		}
+	// Cities
+	if (cities.length>0) {
+		query += "\nAND\nfunded_object.city in ("
 
-
-		if (processCategoryCode) {
-			query += '\n (cb_objects_venture.category_code IN ('
-
-			for (let i=0; i < category_code.length; i++) {
-				query += "\'" + category_code[i] + "\'"
-
-				if (i < category_code.length-1) {
-					query += ','
-				}
+		for (let i=0; i < cities.length; i++) {
+			query += "\'" + cities[i] + "\'"
+			if (i < cities.length-1) {
+				query += ", "
 			}
-			query += '))';
-
 		}
+		query += ")"
+	}
 
-		//  End nested query
-		query += '\n ) t '
+	// Funding round types
+	if (funding_round_types.length>0) {
+		query += "\nAND\ncb_funding_rounds.funding_round_type in ("
 
-		//  Grouping must align with selection
-		query += '\nGROUP BY year'
-
-		if (processFundingRound) {
-			query += ", funding_round_type"
+		for (let i=0; i < funding_round_types.length; i++) {
+			query += "\'" + funding_round_types[i] + "\'"
+			if (i < funding_round_types.length-1) {
+				query += ", "
+			}
 		}
-		if (processCategoryCode) { 
-			query += ", category_code"
+		query += ")"
+	}
+
+	// Category codes
+	if (category_codes.length>0) {
+		query += "\nAND\nfunded_object.category_code in ("
+
+		for (let i=0; i < category_codes.length; i++) {
+			query += "\'" + category_codes[i] + "\'"
+			if (i < category_codes.length-1) {
+				query += ", "
+			}
 		}
+		query += ")"
+	}
 
-		//  Sort
-		query += '\nORDER BY ' 
+	query += "\ORDER BY cb_funding_rounds.raised_amount_usd DESC, funded_at DESC;"
 
-		if (processFundingRound) {
-			query += "funding_round_type, ";
+	return query;
+}
+
+
+function formatDirectoryData(res){
+		// Cannot use self.directoryColumns, because formatDirectoryData is passed as a
+		// function parameter without the Database() object
+		let directoryColumns = [
+			'Funded date', 'Funded entity', 'Investor', 'Category', 'Amount', 'State', 'City', 'Funding round'
+			];
+		let entities = [];
+		let data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+			console.log("dir data avail: " + data);
 		}
-		if (processCategoryCode) { 
-			query += "category_code, ";
+		for(let element of data){
+			let entity = {};
+			for(let i = 0; i < element.length; i++){
+				entity[directoryColumns[i]] = element[i];
+			}
+			entities.push(entity);
 		}
-
-		query += ' year';
-
-		//  Finish
-		query += ";"
-		return(query);
+		console.log('entities: ', entities)
+		return entities;
 	}
 
 
-let test = lineQuery(['series-a'], ['advertising', 'web'])
+
+let test = directoryQuery(year=['2012'], cities=['San Francisco', 'New York City'], funding_round_type=['series-a'], category_code=['web'])
 console.log(test);

@@ -110,7 +110,7 @@ class VCMap {
     update() {
         // console.log("initial data: " + Object.keys(this.data))
         let self = this;
-        const toolTipScale = d3.scaleLog()
+        const toolTipScale = d3.scaleLinear()
             .domain([10, 10000000000])
             .range([0, 190]);
         const scale = d3.scaleLog()

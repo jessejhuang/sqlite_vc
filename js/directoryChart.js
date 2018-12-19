@@ -33,41 +33,98 @@ class DirectoryChart {
 				let fundingType = d3.select('#fundingType').property('value');
 				let category = d3.select('#categories').property('value');
 
+            let f_instance = M.FormSelect.getInstance($('#fundingType'));
+            let c_instance = M.FormSelect.getInstance($('#categories'));
+
+            let funding_round_types = f_instance.getSelectedValues();
+            let catagory_codes= c_instance.getSelectedValues();
+
+            if (funding_round_types[0]=="total") {funding_round_types = [];}
+            if (catagory_codes[0]=="total") {catagory_codes = [];}
+
 			// Update directory chart if cities are selected
-			let query = self.DB.directoryQuery(self.current, self.cities, fundingType, category, undefined);
+			// directoryQuery(years, cities, funding_round_types, category_codes)
+			let years = [];
+			for (let j = this.current; j < this.maxYear+1; j++) {
+				years.push(j);
+			}
+			// console.log(years);
+
+			let query = self.DB.directoryQuery(years, [self.cities], [funding_round_types], [catagory_codes]);
 			if(self.cities.length !== 0){
+				console.log("min year: " + this.current);
+				console.log("max year: " + this.maxYear);
 				self.DB.processQuery(query, self.DB.formatDirectoryData)
 					.then(e => {
 						let directoryData = JSON.parse(JSON.stringify(e)).sort();
-						self.svg.attr('height', d3.max([500, directoryData.length * 20]));
-						d3.select('#directoryChart').selectAll('tspan')
-							.data(directoryData)
-							.enter()
-							.append('tspan')
-								.text(d => `${d.name}`)
-								.attr('x', 0)
-								.attr('dy', 20)
-								.on('click', d => {
-									self.profileChart.directoryUpdate(d);
-								})
-								.style('fill', d => {
-									if(d.entity_type === 'Company'){
-										return '#d9e4f3';
-									}
-									else{
-										return '#93bad7';
-									}
-								});
-					}, err => {
-						console.log(err);
-					})
+						let markup;
+						$("#transaction-list thead").remove();
+						$("#transaction-list tr").remove();
+
+						// Header
+						let header = "<thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>"
+						$("#transaction-list").append(header);
+
+						let maxRows = 100;
+						for (let i=0; i < maxRows; i++) {
+							// console.log(directoryData[i]);
+                 			markup = "<tr>";
+                 			markup += "<td>" + directoryData[i]['Funded at'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['Funded entity'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['Investor'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['Raised amount'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['Category'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['Funding round'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['State'] + "</td>"
+                 			markup += "<td>" + directoryData[i]['City'] + "</td>"
+                 			markup += "</tr>"                 			
+                 			$("table tbody").append(markup);
+						}
+
+// Category: "web"
+// City: "San Francisco"
+// Funded at: "2007-08-01"
+// Funded entity: "FFWD Wheels"
+// Funding round: "series-a"
+// Investor: "Draper Fisher Jurvetson (DFJ)"
+// Raised amount: 1700000
+// State: "CA"
+						// console.log("ayyy");
+						// console.log(directoryData);
+						// self.svg.attr('height', d3.max([500, directoryData.length * 20]));
+						
+
+
+					// 	d3.select('#directoryChart').selectAll('tspan')
+					// 		.data(directoryData)
+					// 		.enter()
+					// 		.append('tspan')
+					// 			.text(d => `${d.name}`)
+					// 			.attr('x', 0)
+					// 			.attr('dy', 20)
+					// 			.on('click', d => {
+					// 				self.profileChart.directoryUpdate(d);
+					// 			})
+					// 			.style('fill', d => {
+					// 				if(d.entity_type === 'Company'){
+					// 					return '#d9e4f3';
+					// 				}
+					// 				else{
+					// 					return '#93bad7';
+					// 				}
+					// 			});
+					// }, err => {
+					// 	console.log(err);
+					// }
+				})
 			}
     }
 
     // Called when the user clicks the timeline
-	changeYear(year){
+	changeYear(minYear, maxYear){
 		let self = this;
-		self.current = year;
+		self.current = minYear;
+		this.maxYear = maxYear;
 		self.update();
 	}
 }

@@ -98,8 +98,6 @@ class TimeSelector {
     initiate(data) {
         var self = this;
         let temp = this.formatData(data);
-        console.log("temp");
-        console.log(temp);
         // console.log("temp: " + Object.keys(temp));
         // console.log("temp data: " + temp['data']);
         // for (let i=0; i <temp['data'].length; i++) {
