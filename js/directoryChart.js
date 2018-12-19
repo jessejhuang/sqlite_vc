@@ -14,7 +14,7 @@ class DirectoryChart {
 				.attr("height", this.height + this.margin.top + this.margin.bottom)
 
 			this.svg.append('a')
-				.attr('xlink:href', '#profileChart')
+				// .attr('xlink:href', '#profileChart')
 				.append('text')
 					.attr("id", "directoryChart")
 					// this.initialize();

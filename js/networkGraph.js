@@ -42,7 +42,7 @@ class NetworkGraph {
     
     update(data) {
         var self = this;
-        console.log('network graph update: ', data);
+        //console.log('network graph update: ', data);
         
         self.data = JSON.parse(data);
         self.updateProfile();
@@ -196,7 +196,7 @@ class NetworkGraph {
         self.selected = {"type":"clicked type", "value":"clicked name"};
         // Update profile chart                                     
         let profileData = JSON.stringify(self.selected);
-        self.profileChart.update(profileData);
+        // self.profileChart.update(profileData);
     }
     
 

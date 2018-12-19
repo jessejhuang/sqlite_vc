@@ -50,26 +50,37 @@
 	mapQuery(funding_round_type, category_code, limit){
 		// Always select these fields
   
-  if(funding_round_type.length == 1){
+  if (funding_round_type[0]== '') {
+   funding_round_type = [];
+  }
+  if (category_code[0] == '') { 
+			category_code = [];
+		}
+  
+  if(funding_round_type.length == 0){
+    funding_round_type = 'IS NOT NULL';
+  }
+  else if(funding_round_type.length == 1){
+   
 			funding_round_type = `IN (\'${funding_round_type[0]}\')`;
+   
 		} else{
 			funding_round_type = funding_round_type.map(round => `\'${round}\'`);
 			funding_round_type = `IN (${funding_round_type.join(', ')})`;
 		}
   
-  if(category_code.length == 1){
+  if(category_code.length == 0){
+    category_code = 'IS NOT NULL';
+  }
+  else if(category_code.length == 1){
+   
 			category_code = `IN (\'${category_code[0]}\')`;
+   
 		} else{
 			category_code = category_code.map(code => `\'${code}\'`);
 			category_code = `IN (${category_code.join(', ')})`;
 		}
-  
-  if (funding_round_type==="IN ('total')") {
-			funding_round_type = 'IS NOT NULL';
-		}
-		if (category_code==="IN ('total')") { 
-			category_code = 'IS NOT NULL';
-		}
+ 
   
 		let query = `
 			SELECT
@@ -118,7 +129,7 @@
 			query += `LIMIT ${limit}`;
 		}
 		query += ';';
-  
+  //console.log(query);
 		return query;
 	}
 
@@ -151,15 +162,25 @@
 		return cities;
 	}
 
-	lineQuery(funding_round_type=['total'], category_code=['total']) {
- 
+	lineQuery(funding_round_type=[], category_code=[]) {
+  
+  if (funding_round_type[0]== '') {
+   funding_round_type = [];
+  }
+  if (category_code[0] == '') { 
+			category_code = [];
+		}
+  
+  //console.log(funding_round_type);
+  //console.log(category_code);
+  
 		let processFundingRound =true;
 		let processCategoryCode =true;
 
-		if (funding_round_type[0]=='total') {
+		if (funding_round_type.length == 0) {
 			processFundingRound=false;
 		}
-		if (category_code[0]=='total') { 
+		if (category_code.length == 0) { 
 			processCategoryCode=false;
 		}
 
@@ -266,7 +287,6 @@
 
 		//  Finish
 		query += ";";
-
 		return(query);
 	}
 
@@ -529,7 +549,83 @@
 	}
 
 	profileQuery(name){
+		let profileColumns = [
+			'name', 'entity_type', 'homepage_url', 'logo_url', 'city',
+			'description', 'short_description', 'overview',
+			'cb_objects.status',
+			'founded_at', 'cb_funding_rounds.funded_at',
+			'first_funding_at', 'last_funding_at',
+			'funding_total_usd', 
+			'cb_funding_rounds.raised_amount_usd',
+			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
+		];
+		let crunchBaseVCTypes = ['FinancialOrg', 'People'];
+		let crunchBaseVentureTypes = ['Company'];
+		let crunchbaseTypes = crunchBaseVCTypes.concat(crunchBaseVentureTypes);
+		let query = '';
+		for(let i = 0; i < crunchbaseTypes.length; i++){
+			query += 'SELECT DISTINCT';
+			for(let j = 0; j < profileColumns.length; j++){
+				query += ` ${profileColumns[j]}`;
+				if(j !== profileColumns.length - 1){
+					query += ', ';
+				}
+			}
+			query += ' FROM cb_objects';
+			if(crunchBaseVentureTypes.includes(crunchbaseTypes[i])){
+				query += ' INNER JOIN cb_investments on cb_investments.funded_object_id=cb_objects.id ';
+			}
+			else if(crunchBaseVCTypes.includes(crunchbaseTypes[i])){
+				query += ' INNER JOIN cb_investments on cb_investments.investor_object_id=cb_objects.id ';
+			}
+			query += ' INNER JOIN cb_funding_rounds on cb_investments.funding_round_id=cb_funding_rounds.id ';
+			query += `
+				WHERE (name='${name}')	
+			`;
+			if(i != crunchbaseTypes.length - 1){
+				query += ' UNION ';
+			}
+		}
+		query += ';';
+		return query;
+	}
 
+	formatProfileData(res){
+		let profileColumns = [
+			'name', 'entity_type', 'homepage_url', 'logo_url', 'city',
+			'description', 'short_description', 'overview',
+			'cb_objects.status',
+			'founded_at', 'cb_funding_rounds.funded_at',
+			'first_funding_at', 'last_funding_at',
+			'funding_total_usd', 
+			'cb_funding_rounds.raised_amount_usd',
+			'cb_funding_rounds.funding_round_type', 'cb_objects.category_code'
+		];
+		let fundIndex = profileColumns.findIndex(d => d === 'cb_funding_rounds.raised_amount_usd');
+		let dateIndex = profileColumns.findIndex(d => d === 'cb_funding_rounds.funded_at');
+		let typeIndex = profileColumns.findIndex(d => d === 'cb_funding_rounds.funding_round_type');
+		let data = [];
+		if(res[0] !== undefined){
+			data = res[0].values;
+		}
+		let companyInfo = {};
+		companyInfo['history'] = [];
+		for(let i = 0; i < data.length; i++){
+			if(i === 0){
+				for(let j = 0; j < profileColumns.length; j++){
+					if(j !== fundIndex && j !== dateIndex && j !== typeIndex){
+						companyInfo[profileColumns[j]] = data[i][j];
+					}
+				}
+			}
+			companyInfo['history'].push({
+				date: data[i][dateIndex],
+				amount: data[i][fundIndex],
+				funding_type: data[i][typeIndex]
+			});
+		}
+		console.log('format Profile data: ', companyInfo);
+		return companyInfo;
 	}
 
 }

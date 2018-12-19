@@ -1,10 +1,11 @@
 class VCMap {
-    constructor(directoryChart,networkGraph, networkUpdate) {
+    constructor(directoryChart,networkGraph, networkUpdate,DB) {
         // console.log("On construction: " + DB);
 
         this.networkUpdate = networkUpdate;
         this.networkGraph = networkGraph;
-        this.DB = new Database();
+        //this.DB = new Database();
+        this.DB = DB;
         this.directoryChart = directoryChart;
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
         this.width = 1020 - this.margin.left - this.margin.right;
@@ -19,11 +20,11 @@ class VCMap {
           d3.select("#vcMapChart").attr("transform", d3.event.transform);
         }  
 
-        const zoom = d3.zoom()
-            .scaleExtent([1, 40])
-            .translateExtent([[0,0], [this.width, this.height]])
-            .extent([[this.margin.left, this.margin.top], [this.margin.left+this.width, this.margin.top+this.height]])
-            .on("zoom", zoomed);
+        // const zoom = d3.zoom()
+        //     .scaleExtent([1, 40])
+        //     .translateExtent([[0,0], [this.width, this.height]])
+        //     .extent([[this.margin.left, this.margin.top], [this.margin.left+this.width, this.margin.top+this.height]])
+        //     .on("zoom", zoomed);
 
 
 
@@ -33,8 +34,8 @@ class VCMap {
             //.attr("width", this.width + this.margin.left + this.margin.right)
             //.attr("height", this.height + this.margin.top + this.margin.bottom)
             .attr("align","center")
-            .attr("id", "vcMapChart")
-            .call(zoom);
+            .attr("id", "vcMapChart");
+            // .call(zoom);
 
         // Define the SVG clipPath
         this.clip = this.svg.append("defs")

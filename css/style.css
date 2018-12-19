@@ -1,10 +1,7 @@
 body {
     font: 14px sans-serif;
 }
-/*.map {
-    width: 100%;
-    display: inline-block;
-}*/
+
 .sideBar {
     width: 25%;
     float:right;
@@ -29,6 +26,7 @@ body {
     fill: black;
     font-weight: 600;
 }
+
 .datetext{
     text-anchor: middle;
     font-size: 0.5vh;
@@ -38,4 +36,8 @@ body {
      width: 800px;
      height: 900px;
      overflow: auto;
+}
+#profModal {
+    height: 90%;
+    width: 90%;
 }
