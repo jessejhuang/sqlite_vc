@@ -35,7 +35,7 @@ body {
 #transactions-table{
      /*width: 800px;
      height: 900px;*/
-     height: 85vh;
+     height: 87vh;
      overflow: scroll;
 }
 #profModal {
