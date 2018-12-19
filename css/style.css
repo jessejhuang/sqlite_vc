@@ -50,6 +50,11 @@ body {
   overflow: scroll;
 }
 
+#profSummary{
+    height: 60vh;
+    overflow: scroll;
+  }
+
 tbody {
   display:block;
   height:80vh;

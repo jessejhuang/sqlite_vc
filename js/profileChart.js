@@ -144,10 +144,18 @@ class ProfileChart {
             .attr('y', `${self.y1}%`)
             .style('font-size', '20px');
         self.y1 += 15;
+        self.summarySVG.append('text')
+            .text('Overview: N/A')
+            .attr('id', 'profileOverview')
+            .attr('x', '5%')
+            .attr('y', `${self.y1}%`)
+            .style('font-size', '20px');
+        self.y1 += 15;
     }
 
     summary(data){
         let self = this;
+        console.log('summary: ', data)
         let companyType = data.entity_type === 'FinancialOrg' ? 'Entity Type: Venture' :
             data.entity_type === 'People' ? 'Entity Type: Person' :
             'Entity Type: VC Firm';
@@ -160,6 +168,7 @@ class ProfileChart {
         let yearFounded = data['founded_at'] ? data['founded_at'] : 'Unknown';
         let firstYear = data['first_funding_at'] ? data['first_funding_at'] : year;
         let lastYear = data['last_funding_at'] ? data['last_funding_at'] : year;
+        let overview = data['overview'] ? data['overview'] : 'N/A';
 
         let totalFunding = data.funding_total_usd
             ? data.funding_total_usd
@@ -183,6 +192,8 @@ class ProfileChart {
             .text(`City: ${data.city}`);
         d3.select('#profileStatus')
             .text(`Status: ${status}`);
+        d3.select('#profileOverview')
+            .text(`Status: ${overview}`);
         
         if(companyType === 'Venture'){
             d3.select('#profileTotalFunding')
@@ -240,7 +251,7 @@ class ProfileChart {
             .style('font', `${self.fontSize}px`)
             .call(yAxis);
         self.cdfSVG.append('g')
-            .attr('transform', 'translate(70, 257)')
+            .attr('transform', 'translate(70, 276)')
             .style('font', `${self.fontSize}px`)
             .call(xAxis);
         self.cdfSVG.append('path')
