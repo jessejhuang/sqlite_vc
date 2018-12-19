@@ -19,32 +19,102 @@
                 <!-- CONTENT HERE -->
                 <!-- Map chart -->
                 <div class="row">
-                    <div class="input-field col s2">
-                        <select id = "fundingType">
-                            
-                        </select>
-                        <label>Fund Type Select</label>
+                    <div class="col s3">
+                        <ul>
+                            <li>
+                            <label for= "fundingType">Fund Type Select</label>
+                            <select multiple id = "fundingType">
+                                <option value="" disabled>Total</option>
+                                <option value="angel">Angel</option>
+                                <option value="crowdfunding">Crowdfunding</option>
+                                <option value="other">Other</option>
+                                <option value="post-ipo">Post IPO</option>
+                                <option value="private-equity">Private Equity</option>
+                                <option value="series-a">Series-A</option>
+                                <option value="series-b">Series-B</option>
+                                <option value="series-c+">Series-C+</option>
+                                <option value="venture">Venture</option>
+                            </select>
+                            </li>
+                            <li>
+                            <label for="categories">Category Select</label>
+                            <select multiple id = "categories">
+                                <option value="" disabled>Total</option>
+                                
+                                <option value="advertising">Advertising</option>
+                                <option value="analytics">Analytics</option>
+                                <option value="automotive">Automotive</option>
+                                <option value="biotech">Biotech</option>
+                                <option value="cleantech">Cleantech</option>
+                                <option value="consulting">Consulting</option>
+                                <option value="design">Design</option>
+                                <option value="ecommerce">E-commerce</option>
+                                <option value="education">Education</option>
+                                <option value="enterprise">Enterprise</option>
+                                <option value="fashion">Fashion</option>
+                                <option value="finance">Finance</option>
+                                <option value="games_video">Video Games</option>
+                                <option value="government">Government</option>
+                                <option value="hardware">Hardware</option>
+                                <option value="health">Health</option>
+                                <option value="hostpitality">Hostpitality</option>
+                                <option value="legal">Legal</option>
+                                <option value="local">Local</option>
+                                <option value="manufacturing">Manufacturing</option>
+                                <option value="medical">Medical</option>
+                                <option value="messaging">Messaging</option>
+                                <option value="mobile">Mobile</option>
+                                <option value="music">Music</option>
+                                <option value="nanotech">Nanotech</option>
+                                <option value="network_hosting">Network Hosting</option>
+                                <option value="news">News</option>
+                                <option value="nonprofit">Non-profit</option>
+                                <option value="other">Other</option>
+                                <option value="pets">Pets</option>
+                                <option value="photo_video">Photo-Video</option>
+                                <option value="public_relations">Public Relations</option>
+                                <option value="real_estate">Real Estate</option>
+                                <option value="search">Search</option>
+                                <option value="security">Security</option>
+                                <option value="semiconductor">Semiconductor</option>
+                                <option value="social">Social</option>
+                                <option value="software">Software</option>
+                                <option value="sports">Sports</option>
+                                <option value="transportation">Transportation</option>
+                                <option value="travel">travel</option>
+                                <option value="web">Web</option>
+                               
+                            </select>
+                            </li>
+                        </ul> 
                     </div>
-                    <div class="input-field col s2">
-                        <select id = "categories">
-                           
-                        </select>
-                        <label>Category Select</label>
+                    
+                    <div class= "col s9" >
+                        <div id="timeSelector">
+                        </div>
                     </div>
                 </div>
-
-                <div id="timeSelector"></div>
-                <br>
-
-                <div id="directory" class="sideBar">
-                    <h3>Organizations</h3>
-                    <div id="org-list"></div>
+                <div class="row">
+                    <div class="col s9 offset-s3">
+                        <div id="vcMap" ></div>
+                    </div>
                 </div>
                 
+                <div class="row">
+                    <div class="col s3">
+                        <h3>Organizations</h3>
+                        <div id="directory">
+                            <div id="org-list"></div>
+                        </div>
+                    </div>
+                    <div class="col s9">
+                         <div id="networkGraph"></div>
+                    </div>
+                </div>
 
-                <div id="vcMap" class="map"></div>
+                
 
-                <div id="networkGraph"></div>
+               
 
 
                 
@@ -72,6 +142,8 @@
                             <a href="#!" class="modal-close waves-effect waves-green btn-flat">Agree</a>
                     </div>
                 </div>
+                <div id="profileChart"></div>
+                    
             <!--</div>-->
         </div>
     <!-- SCRIPTS HERE -->

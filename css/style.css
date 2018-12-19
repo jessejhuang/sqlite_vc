@@ -1,10 +1,10 @@
 body {
     font: 14px sans-serif;
 }
-.map {
-    width: 75%;
+/*.map {
+    width: 100%;
     display: inline-block;
-}
+}*/
 .sideBar {
     width: 25%;
     float:right;
