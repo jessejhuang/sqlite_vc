@@ -126,7 +126,8 @@
 		//Sort
 		query += ' ORDER BY cb_objects_venture.city, year';
 		query += ';';
-  //console.log(query);
+		// console.log("map query")
+  		// console.log(query);
 		return query;
 	}
 
@@ -290,6 +291,8 @@
 
 		//  Finish
 		query += ";";
+		// console.log("Line query")
+		// console.log(query);
 		return(query);
 	}
 

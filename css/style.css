@@ -89,16 +89,14 @@ td{
     word-wrap:break-word
 }
 
-/*.circle{
-  pointer-events: none !important;
-}*/
-/*#current_t,#current_i{
-  pointer-events: none !important;
+
+#linearScaling {
+    position: absolute;
+    right: 250px;
 }
 
-#current_c{
-  pointer-events: auto !important;
-}*/
-
-
+#logScaling {
+    position: absolute;
+    right: 75px;
+}
 

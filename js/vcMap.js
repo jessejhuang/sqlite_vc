@@ -15,24 +15,12 @@ class VCMap {
         this.current = 2013;
         this.maxYear = 2013;
         this.selectedCities = [];
-
-        function zoomed(){
-          d3.select("#vcMapChart").attr("transform", d3.event.transform);
-        }  
-
-        // const zoom = d3.zoom()
-        //     .scaleExtent([1, 40])
-        //     .translateExtent([[0,0], [this.width, this.height]])
-        //     .extent([[this.margin.left, this.margin.top], [this.margin.left+this.width, this.margin.top+this.height]])
-        //     .on("zoom", zoomed);
-
+        this.scaleType = 'log';
 
 
         this.svg = d3.select("#vcMap").append("svg")
             .attr("preserveAspectRatio", "xMinYMin meet")
             .attr("viewBox", "0 0 "+this.width+" "+this.height)
-            //.attr("width", this.width + this.margin.left + this.margin.right)
-            //.attr("height", this.height + this.margin.top + this.margin.bottom)
             .attr("align","center")
             .attr("id", "vcMapChart");
             // .call(zoom);
@@ -95,6 +83,8 @@ class VCMap {
                 displayFunds = (displayFunds/1000000)
                 displayFunds = Math.round(displayFunds * 10) / 10;
                 displayFunds = ("$" + displayFunds + "M");
+            } else {
+                displayFunds = ("$" + displayFunds);
             }
 
                 let template = `
@@ -133,27 +123,24 @@ class VCMap {
                 }
             });
         });
+
+        this.scale = d3.scaleLog()
+        .domain([1000, 20050000000])
+        .range([0, 10]);
     }
     initialize(data){
         this.data = JSON.parse(data);
-
-        // if (cities != null) {
-        //     console.log("set selectedCities");
-        //     this.selectedCities = cities;
-        // }
     }
     
     update() {
         let self = this;
-        console.log("selected cities in update");
-        console.log(self.selectedCities);
-        const toolTipScale = d3.scaleLinear()
-            .domain([10, 10000000000])
-            .range([0, 190]);
-        const scale = d3.scaleLog()
-            .domain([10, 10000000000])
-            .range([0, 10]);
+
+        // const scale = d3.scaleLog()
+        //     .domain([1000, 10000000000])
+        //     .range([0, 10]);
         let data = this.data;
+        let maxFunds = 0;
+        let minFunds = 100000000000;
         self.coords.then(cityCoordinates => {
             self.dots.selectAll('.city').remove();
             self.dots.selectAll('.city')
@@ -202,7 +189,32 @@ class VCMap {
                         if ( (funds === 0) || (typeof(funds) == "undefined") ){
                             return 0;
                         }
-                        return scale(funds);
+                        // if (funds > maxFunds) {
+                        //     maxFunds = funds;
+                        //     if (this.scaleType=='linear') {
+                        //         self.scale = d3.scaleLinear()
+                        //                     .domain([minFunds, maxFunds])
+                        //                     .range([0, 10]);
+                        //     } else {
+                        //         self.scale = d3.scaleLog()
+                        //                     .domain([minFunds, maxFunds])
+                        //                     .range([0, 10]);
+                        //     }
+                        // } else if (funds < minFunds) {
+                        //     minFunds = funds;
+                        //     if (this.scaleType=='linear') {
+                        //         self.scale = d3.scaleLinear()
+                        //                     .domain([minFunds, maxFunds])
+                        //                     .range([0, 10]);
+                        //     } else {
+                        //         self.scale = d3.scaleLog()
+                        //                     .domain([minFunds, maxFunds])
+                        //                     .range([0, 10]);
+                        //     }
+                        // }
+
+                        
+                        return self.scale(funds);
                     })
                     .on('mouseover', city => {
 
@@ -290,6 +302,26 @@ class VCMap {
         self.directoryChart.update();
         let networkParams = {"yearMin":self.current,"yearMax":self.maxYear,"type":"city","cities":self.selectedCities};
         self.networkUpdate(JSON.stringify(networkParams));
+    }
+
+    changeScale(scaleType) {
+        var self = this;
+        console.log("self...")
+        console.log(self)
+        if (scaleType=="linear") {
+            self.scale = d3.scaleLinear()
+            .domain([1000, 10000000000])
+            .range([0, 10]);
+            this.scaleType = 'linear';
+            self.update();
+        }
+        if (scaleType=="log") {
+            self.scale = d3.scaleLog()
+            .domain([1000, 10000000000])
+            .range([0, 10]);
+            this.scaleType = 'log';
+            self.update();
+        }
     }
 
 }

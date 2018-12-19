@@ -1,10 +1,10 @@
 class ProfileChart {
 
     constructor(DB) {
-        this.margin = {top: 20, right: 100, bottom: 50, left: 200};
+        this.margin = {top: 20, right: 200, bottom: 50, left: 100};
         this.width = 1200 - this.margin.left - this.margin.right;
         this.height = 300 - this.margin.top - this.margin.bottom;
-        this.width_full = 1200;
+        this.width_full = 1100;
         this.height_full = 300;
         this.fontSize = 14;
         this.db = DB;
@@ -135,15 +135,18 @@ class ProfileChart {
 
         let matches;
         matches = yearFounded.match(/\d+/g)
-        if(matches[0]){
+        console.log("year found matches: " + matches);
+        if(matches){
             yearFounded = matches[0]
         }
         matches = firstYear.match(/\d+/g)
-        if(matches[0]){
+        console.log("firstYear found matches: " + matches);
+        if(matches){
             firstYear = matches[0]
         }
         lastYear = lastYear.match(/\d+/g)
-        if(matches[0]){
+        console.log("lastYear found matches: " + matches);
+        if(matches){
             yearFounded = matches[0]
         }
 
@@ -152,7 +155,7 @@ class ProfileChart {
             : '0';
         
         let funding = data['cb_funding_rounds.raised_amount_usd'];
-
+        // let city = data.city ? "Unknown" : data.city 
         d3.select('#profileLogo')
             .attr('xlink:href', logo);
         d3.select('#profileLink')
@@ -209,7 +212,7 @@ class ProfileChart {
         let amounts = cumulative.map(d => d.amount);
         let xScale = d3.scaleTime()
             .domain([d3.min(dates), d3.max(dates)])
-            .range([0, this.width]); 
+            .range([this.margin.left, this.margin.left+this.width]); 
 
         let yScale = d3.scaleLinear()
             .domain([0, d3.max(amounts)])
@@ -224,12 +227,26 @@ class ProfileChart {
             .curve(d3.curveBasis);
 
         self.cdfSVG.append('g')
-            .attr('transform', 'translate(70, 25)')
-            .style('font', `${self.fontSize}px`)
-            .call(yAxis);
+            .attr('transform', 'translate(' + (this.margin.left+60) + ', 5)')
+            // .style('font', `${self.fontSize}px`)
+            .style("font", "26px Product Sans")
+            .call(yAxis                    
+                .tickFormat(function(d) { 
+                    if (d==0) {
+                        return("$0")
+                    }
+                    if(d > 999999999) {
+                        return("$" + (d/1000000000) + " B");
+                    } else if (d > 999999) {
+                        return("$" + (d/1000) + " M");
+                    } else {
+                        return("$" + (d/1000));
+                    }})
+                .ticks(4));
         self.cdfSVG.append('g')
-            .attr('transform', 'translate(70, 276)')
-            .style('font', `${self.fontSize}px`)
+            .attr('transform', 'translate(70, 257)')
+            // .style('font', `${self.fontSize}px`)
+            .style("font", "26px Product Sans")
             .call(xAxis);
         self.cdfSVG.append('path')
             .attr('class', 'line')
@@ -260,7 +277,7 @@ class ProfileChart {
             });
         }
         const xScale = d3.scaleBand()
-          .range([0, this.width])
+          .range([this.margin.left, this.margin.left+this.width])
           .domain(rounds.map(d => d.type))
           .padding(0.4);
         const yScale = d3.scaleLinear()
@@ -282,13 +299,27 @@ class ProfileChart {
 
         self.barSVG.append('g')
             .attr('transform', 'translate(70, 257)')
-            .style('font', `${self.fontSize}px`)
+            // .style('font', `${self.fontSize}px`)
+            .style("font", "26px Product Sans")
             .call(d3.axisBottom(xScale));
 
         self.barSVG.append('g')
-            .attr('transform', 'translate(70, 27)')
-            .style('font', `${self.fontSize}px`)
-            .call(d3.axisLeft(yScale));
+            .attr('transform', 'translate(' + (this.margin.left+70) + ', 27)')
+            // .style('font', `${self.fontSize}px`)
+            .style("font", "26px Product Sans")
+            .call(d3.axisLeft(yScale)                
+                .tickFormat(function(d) { 
+                    if (d==0) {
+                        return("$0")
+                    }
+                    if(d > 999999999) {
+                        return("$" + (d/1000000000) + " B");
+                    } else if (d > 999999) {
+                        return("$" + (d/1000) + " M");
+                    } else {
+                        return("$" + (d/1000));
+                    }})
+                    .ticks(4));
     }
 
     scatter(name, history){
@@ -298,7 +329,7 @@ class ProfileChart {
         let amounts = history.map(d => d.amount);
         let xScale = d3.scaleTime()
             .domain([d3.min(dates), d3.max(dates)])
-            .range([0, this.width]); 
+            .range([this.margin.left, this.margin.left+this.width]); 
 
         let yScale = d3.scaleLinear()
             .domain([0, d3.max(amounts)])
@@ -308,12 +339,26 @@ class ProfileChart {
         let yAxis = d3.axisLeft().scale(yScale).ticks(5);
         const colors = d3.scaleOrdinal(d3.schemeCategory10)
         self.scatterSVG.append('g')
-            .attr('transform', 'translate(70, 5)')
-            .style('font', `${self.fontSize}px`)
-            .call(yAxis);
+            .attr('transform', 'translate(' + (this.margin.left+70) + ', 5)')
+            // .style('font', `${self.fontSize}px`)
+            .style("font", "26px Product Sans")
+            .call(yAxis                
+                .tickFormat(function(d) { 
+                    if (d==0) {
+                        return("$0")
+                    }
+                    if(d > 999999999) {
+                        return("$" + (d/1000000000) + " B");
+                    } else if (d > 999999) {
+                        return("$" + (d/1000) + " M");
+                    } else {
+                        return("$" + (d/1000));
+                    }})
+                .ticks(4));
         self.scatterSVG.append('g')
             .attr('transform', 'translate(70, 257)')
-            .style('font', `${self.fontSize}px`)
+            // .style('font', `${self.fontSize}px`)
+            .style("font", "26px Product Sans")
             .call(xAxis);
         self.scatterSVG.selectAll('.profScatterDot')
             .data(history)

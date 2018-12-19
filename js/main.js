@@ -185,7 +185,18 @@ console.time("Main");
         $('select').formSelect($('select').on('change', filterUpdates));  
         filterUpdates();
 
+        $('#linearScaling').click( function() {
+            vcMap.changeScale("linear");
+        });
+        $('#logScaling').click( function() {
+            vcMap.changeScale("log");
+        });
+        
 
+        // .on('click', vcMap.changeScale('linear'));
+        // $('#logScaling').on('click', vcMap.changeScale('log'));
+
+        
     }
 
     /**
