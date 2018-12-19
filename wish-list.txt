@@ -1,13 +1,13 @@
 ToDo list:
 
-Profile chart
-Connecting profile chart with network and transactions
-Labelling
+Profile chart -- need to handle null summary
 Title
+Labelling
 Configure instance to serve up
 Screen Cast
 Peer Reviews :)
 
+Connecting profile chart with network and transactions X Done
 Legend for line chart X Done
 Fix bubble coloring in map    X Done
 On city hover summary chart   X Done
