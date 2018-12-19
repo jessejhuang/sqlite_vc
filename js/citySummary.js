@@ -185,6 +185,15 @@ class CitySummary {
           context.append("g")
                 .style("font", "26px Product Sans")
                 .call(yAxis
+                    .tickFormat(function(d) { 
+                        if (d==0) {
+                            return("$0")
+                        }
+                        if(d > 999999999) {
+                            return("$" + (d/1000000000) + " B");
+                        } else {
+                            return("$" + (d/1000000) + " M");
+                    }})
                     .ticks(4));
 
           // context.append("g")

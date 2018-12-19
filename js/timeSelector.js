@@ -142,7 +142,7 @@ class TimeSelector {
         }
 
         let brush = d3.brushX()
-            .extent([[0, 0], [self.margin.left + self.width, self.margin.top + self.height]])
+            .extent([[0, 0], [self.width, self.margin.top + self.height]])
             .on("brush end", brushed); 
 
         let line = d3.line()
@@ -198,6 +198,15 @@ class TimeSelector {
           context.append("g")
                 .style("font", "26px Product Sans")
                 .call(yAxis
+                    .tickFormat(function(d) { 
+                        if (d==0) {
+                            return("$0")
+                        }
+                        if(d > 999999999) {
+                            return("$" + (d/1000000000) + " B");
+                        } else {
+                            return("$" + (d/1000000) + " M");
+                        }})
                     .ticks(4));
 
           context.append("g")
