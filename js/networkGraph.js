@@ -91,6 +91,8 @@ class NetworkGraph {
         //    .domain([0, maxValue])
         //    .range([2, 15]);
         
+        
+         //IMAGE CODE---------------------------
         var g = svg.append("g");
         
         var node = g.selectAll("node")
@@ -108,7 +110,13 @@ class NetworkGraph {
             .attr("y", function(){return -50;})
             .attr("width", function(){return 100;})
             .attr("height", function(){return 100;});
-            
+        
+        d3.selection.prototype.moveToFront = function() {  
+            return this.each(function(){
+              this.parentNode.appendChild(this);
+            });
+          };
+      
         var setEvents = image
           // Append hero text
           .on( 'click', click)
@@ -121,6 +129,21 @@ class NetworkGraph {
               .attr("y", function(d) { return -150;})
               .attr("height", 300)
               .attr("width", 300);
+              
+            d3.select( this.parentNode ).append("text")
+            .attr('id', 'current')
+            .attr("class", "text")
+            .attr("x", 150)
+            .attr("y", 0)
+            .attr("fill", 'black')
+            .attr("opacity",function(d){return(d.logo_url ? "0.0": "1.0");})
+            .attr("font-size", '5vh')
+            .attr("font-weight", 'bold')
+            .text(function(d) { return d.name; });
+            
+            d3.select( this.parentNode ).moveToFront();
+            d3.select( '#current' ).moveToFront();
+            
           })
           // set back
           .on( 'mouseleave', function() {
@@ -130,13 +153,15 @@ class NetworkGraph {
               .attr("y", function(d) { return -50;})
               .attr("height", 100)
               .attr("width", 100);
+              
+            d3.select( '#current' ).remove();
           });
+          
+        
 
-            
-        //var node = svg.append("g");
-        //    
-        //    
-        //node.attr("class", "nodes")
+         // PRevious COde ==================================   
+        //var node = svg.append("g")
+        //    .attr("class", "nodes")
         //    .selectAll("circle")
         //    .data(graph.nodes)
         //    .enter().append("circle")
@@ -149,7 +174,7 @@ class NetworkGraph {
         //    
         //        return self.color(d.type);
         //    })
-        //    .attr("opacity","0.0")
+        //    .attr("opacity","0.5")
         //    .attr("stroke", function() {
         //        return 'black';
         //    })
@@ -158,46 +183,10 @@ class NetworkGraph {
         //    .on("start", dragstarted)
         //    .on("drag", dragged)
         //    .on("end", dragended));
-            
-            
-            
-        
-        // Append images
-        //node.selectAll("image")
-        //    .data(graph.nodes)
-        //    .enter().append("image")
-        //    .attr("xlink:href",  function(d) { return d.logo_url;})
-        //    .attr("dx", -8)
-        //    .attr("dy", -8)
-        //    .attr("width", 16)
-        //    .attr("height", 16)
-        //    .on('click',click)
-        //    .call(d3.drag()
-        //    .on("start", dragstarted)
-        //    .on("drag", dragged)
-        //    .on("end", dragended));
-        //node.enter().append("image")
-        //    .attr("xlink:href",  function(d) { return d.logo_url;})
-        //    .attr("x", function(d) { return -25;})
-        //    .attr("y", function(d) { return -25;})
-        //    .attr("height", 50)
-        //    .attr("width", 50);
-            
-        //var images = svg.append("g")
-        //    .attr("class", "node")
-        //    .selectAll("image")
-        //    .data(graph.nodes)
-        //    .enter().append("image")
-        //    .attr("xlink:href",  function(d) { return d.logo_url;})
-        //    .attr("x", function(d) { return -25;})
-        //    .attr("y", function(d) { return -25;})
-        //    .attr("height", 50)
-        //    .attr("width", 50);
-            
-        
-            
-    
-        
+        //
+        //    
+        //
+        //
         //// maybe do city centroids
         //var label = svg.append('g')
         //    .attr("class", "label")
