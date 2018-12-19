@@ -50,26 +50,37 @@
 	mapQuery(funding_round_type, category_code, limit){
 		// Always select these fields
   
-  if(funding_round_type.length == 1){
+  if (funding_round_type[0]== '') {
+   funding_round_type = [];
+  }
+  if (category_code[0] == '') { 
+			category_code = [];
+		}
+  
+  if(funding_round_type.length == 0){
+    funding_round_type = 'IS NOT NULL';
+  }
+  else if(funding_round_type.length == 1){
+   
 			funding_round_type = `IN (\'${funding_round_type[0]}\')`;
+   
 		} else{
 			funding_round_type = funding_round_type.map(round => `\'${round}\'`);
 			funding_round_type = `IN (${funding_round_type.join(', ')})`;
 		}
   
-  if(category_code.length == 1){
+  if(category_code.length == 0){
+    category_code = 'IS NOT NULL';
+  }
+  else if(category_code.length == 1){
+   
 			category_code = `IN (\'${category_code[0]}\')`;
+   
 		} else{
 			category_code = category_code.map(code => `\'${code}\'`);
 			category_code = `IN (${category_code.join(', ')})`;
 		}
-  
-  if (funding_round_type==="IN ('total')") {
-			funding_round_type = 'IS NOT NULL';
-		}
-		if (category_code==="IN ('total')") { 
-			category_code = 'IS NOT NULL';
-		}
+ 
   
 		let query = `
 			SELECT
@@ -118,7 +129,7 @@
 			query += `LIMIT ${limit}`;
 		}
 		query += ';';
-  
+  //console.log(query);
 		return query;
 	}
 
@@ -151,18 +162,25 @@
 		return cities;
 	}
 
-	lineQuery(funding_round_type=['total'], category_code=['total']) {
+	lineQuery(funding_round_type=[], category_code=[]) {
   
-  console.log(funding_round_type);
-  console.log(category_code);
+  if (funding_round_type[0]== '') {
+   funding_round_type = [];
+  }
+  if (category_code[0] == '') { 
+			category_code = [];
+		}
+  
+  //console.log(funding_round_type);
+  //console.log(category_code);
   
 		let processFundingRound =true;
 		let processCategoryCode =true;
 
-		if (funding_round_type[0]=='total') {
+		if (funding_round_type.length == 0) {
 			processFundingRound=false;
 		}
-		if (category_code[0]=='total') { 
+		if (category_code.length == 0) { 
 			processCategoryCode=false;
 		}
 
@@ -269,7 +287,7 @@
 
 		//  Finish
 		query += ";";
-  console.log(query);
+  //console.log(query);
 		return(query);
 	}
 
@@ -379,7 +397,7 @@
 			}
 			if(category_code){
 				query += `
-					AND (cb_objects.category_core='${category_code}')	
+					AND (cb_objects.category_code='${category_code}')	
 				`;
 			}
 			if(i != crunchbaseTypes.length - 1){

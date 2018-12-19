@@ -42,7 +42,7 @@ class NetworkGraph {
     
     update(data) {
         var self = this;
-        console.log('network graph update: ', data);
+        //console.log('network graph update: ', data);
         
         self.data = JSON.parse(data);
         self.updateProfile();
