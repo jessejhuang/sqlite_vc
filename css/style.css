@@ -88,3 +88,13 @@ table {
 td{
     word-wrap:break-word
 }
+
+#linearScaling {
+    position: absolute;
+    right: 250px;
+}
+
+#logScaling {
+    position: absolute;
+    right: 75px;
+}

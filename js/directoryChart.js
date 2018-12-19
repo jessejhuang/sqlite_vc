@@ -48,9 +48,6 @@ class DirectoryChart {
 			for (let j = this.current; j < this.maxYear+1; j++) {
 				years.push(j);
 			}
-			// console.log(years);
-			console.log("dir cities:");
-			console.log(self.cities);
 
 			// Remove old table
 			//$("#transaction-list thead").remove();
