@@ -14,7 +14,7 @@ class DirectoryChart {
 				.attr("height", this.height + this.margin.top + this.margin.bottom)
 
 			this.svg.append('a')
-				.attr('xlink:href', '#profileChart')
+				// .attr('xlink:href', '#profileChart')
 				.append('text')
 					.attr("id", "directoryChart")
 					// this.initialize();
@@ -48,7 +48,7 @@ class DirectoryChart {
 								.attr('x', 0)
 								.attr('dy', 20)
 								.on('click', d => {
-									self.profileChart.directoryUpdate(d);
+									self.profileChart.update(d.name);
 								})
 								.style('fill', d => {
 									if(d.entity_type === 'Company'){

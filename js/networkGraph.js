@@ -196,7 +196,7 @@ class NetworkGraph {
         self.selected = {"type":"clicked type", "value":"clicked name"};
         // Update profile chart                                     
         let profileData = JSON.stringify(self.selected);
-        self.profileChart.update(profileData);
+        // self.profileChart.update(profileData);
     }
     
 
