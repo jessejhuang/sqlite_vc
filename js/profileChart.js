@@ -120,9 +120,9 @@ class ProfileChart {
     summary(data){
         let self = this;
         console.log('summary: ', data)
-        let companyType = data.entity_type === 'FinancialOrg' ? 'Entity Type: Venture' :
+        let companyType = data.entity_type === 'FinancialOrg' ? 'Entity Type: VC Firm' :
             data.entity_type === 'People' ? 'Entity Type: Person' :
-            'Entity Type: VC Firm';
+            'Entity Type: Venture';
         let logo = data.logo_url ? data.logo_url : 'images/default_logo.jpg';
         let homepage = data.homepage_url ? data.homepage_url : 'https://www.pixar.com/404';
         let description = data.description ? data.description : data.short_description;
@@ -238,9 +238,9 @@ class ProfileChart {
                     if(d > 999999999) {
                         return("$" + (d/1000000000) + " B");
                     } else if (d > 999999) {
-                        return("$" + (d/1000) + " M");
+                        return("$" + (d/1000000) + " M");
                     } else {
-                        return("$" + (d/1000));
+                        return("$" + (d/1000) + " \'000");
                     }})
                 .ticks(4));
         self.cdfSVG.append('g')
@@ -315,9 +315,9 @@ class ProfileChart {
                     if(d > 999999999) {
                         return("$" + (d/1000000000) + " B");
                     } else if (d > 999999) {
-                        return("$" + (d/1000) + " M");
+                        return("$" + (d/1000000) + " M");
                     } else {
-                        return("$" + (d/1000));
+                        return("$" + (d/1000) + " \'000");
                     }})
                     .ticks(4));
     }
@@ -350,9 +350,9 @@ class ProfileChart {
                     if(d > 999999999) {
                         return("$" + (d/1000000000) + " B");
                     } else if (d > 999999) {
-                        return("$" + (d/1000) + " M");
+                        return("$" + (d/1000000) + " M");
                     } else {
-                        return("$" + (d/1000));
+                        return("$" + (d/1000) + " \'000");
                     }})
                 .ticks(4));
         self.scatterSVG.append('g')

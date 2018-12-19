@@ -99,12 +99,26 @@ td{
     right: 75px;
 }
 
+#medians {
+    position: absolute;
+    right: 825px;
+}
+
+#averages {
+    position: absolute;
+    right: 550px;
+}
+
 #counts {
     position: absolute;
-    right: 250px;
+    right: 325px;
 }
 
 #sums {
     position: absolute;
     right: 75px;
+}
+
+h3 {
+    color: "green";
 }

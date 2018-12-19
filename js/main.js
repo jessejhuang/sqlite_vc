@@ -181,6 +181,16 @@ console.time("Main");
             updateLine();
             // timeSelector.changeScale("log");
         });
+        $('#averages').click( function() {
+            timeSelector.operation = "AVG"
+            updateLine();
+            // timeSelector.changeScale("log");
+        });
+        $('#medians').click( function() {
+            timeSelector.operation = "MEDIAN"
+            updateLine();
+            // timeSelector.changeScale("log");
+        });
     
         
     }

@@ -200,18 +200,21 @@ class TimeSelector {
                 .style("font", "26px Product Sans")
                 .call(yAxis
                     .tickFormat(function(d) { 
-                        if (self.operation=="SUM") {
+                        if (self.operation=="SUM" || self.operation=="AVG" || self.operation=="MEDIAN") {
                             if (d==0) {
                                 return("$0")
                             }
                             if(d > 999999999) {
                                 return("$" + (d/1000000000) + " B");
-                            } else {
+                            } else if (d > 999999) {
                                 return("$" + (d/1000000) + " M");
+                            } else {
+                                return("$" + d);
                             }
-                        } else {
+                        } else if (self.operation=="COUNT") {
                             return(d)
-                        }})
+                        } 
+                    })
                     .ticks(4));
 
           context.append("g")
