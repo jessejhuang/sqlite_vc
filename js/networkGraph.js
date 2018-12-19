@@ -49,8 +49,7 @@ class NetworkGraph {
         
         
         var graph = self.data;
-    
-   
+        
         
         graph.nodes.forEach(function(nodes){
         
@@ -66,6 +65,67 @@ class NetworkGraph {
         let height = self.height;
         
         svg.selectAll("*").remove();
+        
+        
+        svg.append("circle")
+            .attr("r", function(){
+                return 20;
+            })
+            .attr("cx", '20')
+            .attr("cy", '60')
+            .attr("fill", function() {
+                return 'LightSkyBlue';
+                //return self.color(d.type);
+            })
+            .attr("opacity","1.0")
+            .attr("stroke", function() {
+                return 'grey';
+            })
+        svg.append("text")
+            .text('Investor')
+            .attr("dx", 42)
+            .attr("dy", 64)
+            .attr("font-size", "2.5vh")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "left")
+            .attr("fill", function() {
+            return "black";
+            });
+        svg.append("circle")
+            .attr("r", function(){
+                return 20;
+            })
+            .attr("cx", '20')
+            .attr("cy", '20')
+            .attr("fill", function() {
+                return 'LightCoral';
+                //return self.color(d.type);
+            })
+            .attr("opacity","1.0")
+            .attr("stroke", function() {
+                return 'grey';
+            })
+        svg.append("text")
+            .text('Venture')
+            .attr("dx", 42)
+            .attr("dy", 24)
+            .attr("font-size", "2.5vh")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "left")
+            .attr("fill", function() {
+            return "black";
+            });
+            
+        svg.append("text")
+            .text('Top Valued Venture Partnerships')
+            .attr("dx", self.width/2)
+            .attr("dy", 44)
+            .attr("font-size", "4vh")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "middle")
+            .attr("fill", function() {
+            return "black";
+            });    
         
         simulation
             .nodes(graph.nodes);
