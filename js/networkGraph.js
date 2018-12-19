@@ -91,6 +91,31 @@ class NetworkGraph {
         //    .domain([0, maxValue])
         //    .range([2, 15]);
         
+        //some Node Code--------------
+        //var node = svg.append("g")
+        //    .attr("class", "nodes")
+        //    .selectAll("circle")
+        //    .data(graph.nodes)
+        //    .enter().append("circle")
+        //    //.filter(function(d){return d.num > 0;})
+        //    .attr("r", function(d){
+        //        d.r = 20;
+        //        return d.r;
+        //    })
+        //    .attr("fill", function(d) {
+        //    
+        //        return self.color(d.type);
+        //    })
+        //    .attr("opacity","0.5")
+        //    .attr("stroke", function() {
+        //        return 'black';
+        //    })
+        //    .on('click',click)
+        //    .call(d3.drag()
+        //    .on("start", dragstarted)
+        //    .on("drag", dragged)
+        //    .on("end", dragended));
+            
         
          //IMAGE CODE---------------------------
         var g = svg.append("g");
@@ -104,34 +129,51 @@ class NetworkGraph {
             .on("drag", dragged)
             .on("end", dragended));
             
-        var image = node.append("image")
-			 .attr("xlink:href", function(d){return (d.logo_url ? d.logo_url : 'images/default_logo.jpg');})
-            .attr("x", function(){return -50;})
-            .attr("y", function(){return -50;})
-            .attr("width", function(){return 100;})
-            .attr("height", function(){return 100;});
-        
+        var circle = node.append("circle")
+            .attr("class", "circle")
+            //.filter(function(d){return d.num > 0;})
+            .attr("r", function(d){
+                d.r = 20;
+                return d.r;
+            })
+            .attr("fill", function(d) {
+            
+                return self.color(d.type);
+            })
+            .attr("opacity","1")
+            .attr("stroke", function() {
+                return 'black';
+            })
+            .on("click",click);
+//            
+//        var image = node.append("image")
+//			 .attr("xlink:href", function(d){return (d.logo_url ? d.logo_url : 'images/default_logo.jpg');})
+//            .attr("x", function(){return -50;})
+//            .attr("y", function(){return -50;})
+//            .attr("width", function(){return 100;})
+//            .attr("height", function(){return 100;});
+//        
         d3.selection.prototype.moveToFront = function() {  
             return this.each(function(){
               this.parentNode.appendChild(this);
             });
           };
-      
-        var setEvents = image
+//      
+        var setEvents = circle
           // Append hero text
           .on( 'click', click)
 
           .on( 'mouseenter', function() {
             // select element in current context
-            d3.select( this )
-              .transition()
-              .attr("x", function(d) { return -150;})
-              .attr("y", function(d) { return -150;})
-              .attr("height", 300)
-              .attr("width", 300);
+            //d3.select( this )
+            //  .transition()
+            //  .attr("x", function(d) { return -150;})
+            //  .attr("y", function(d) { return -150;})
+            //  .attr("height", 300)
+            //  .attr("width", 300);
               
             d3.select( this.parentNode ).append("text")
-            .attr('id', 'current')
+            .attr('id', 'current_t')
             .attr("class", "text")
             .attr("x", 150)
             .attr("y", 0)
@@ -141,22 +183,49 @@ class NetworkGraph {
             .attr("font-weight", 'bold')
             .text(function(d) { return d.name; });
             
+            d3.select(this.parentNode).append("image")
+            .attr('id', 'current_i')
+			.attr("xlink:href", function(d){console.log(d); return (d.logo_url ? d.logo_url : 'images/default_logo.jpg');})
+            .attr("x", function(){return 20;})
+            .attr("y", function(){return -150;})
+            .attr("width", function(){return 300;})
+            .attr("height", function(){return 300;})
+            
+            //d3.select(this.parentNode).append("circle")
+            //.attr('id', 'current_c')
+            //.attr("r", function(d){
+            //    d.r = 20;
+            //    return d.r;
+            //})
+            //.attr("fill", function(d) {
+            //
+            //    return self.color(d.type);
+            //})
+            //.attr("opacity","0.0")
+            //.on('click',click);
+            
+            
+            
+            
             d3.select( this.parentNode ).moveToFront();
-            d3.select( '#current' ).moveToFront();
+            d3.select( '#current_t' ).moveToFront();
+            d3.select( '#current_i' ).moveToFront();
+            //d3.select( '#current_c' ).moveToFront();
             
           })
           // set back
           .on( 'mouseleave', function() {
-            d3.select( this )
-              .transition()
-              .attr("x", function(d) { return -50;})
-              .attr("y", function(d) { return -50;})
-              .attr("height", 100)
-              .attr("width", 100);
-              
-            d3.select( '#current' ).remove();
+            //d3.select( this )
+            //  .transition()
+            //  .attr("x", function(d) { return -50;})
+            //  .attr("y", function(d) { return -50;})
+            //  .attr("height", 100)
+            //  .attr("width", 100);
+            //d3.select( '#current_c' ).remove(); 
+            d3.select( '#current_t' ).remove(); 
+            d3.select( '#current_i' ).remove();
           });
-          
+//          
         
 
          // PRevious COde ==================================   
