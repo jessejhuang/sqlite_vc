@@ -24,8 +24,13 @@ console.time("Main");
         let yearMax = data.yearMax;
         let type = data.type;
         let cities = data.cities;
+        let f_instance = M.FormSelect.getInstance($('#fundingType'));
+        let c_instance = M.FormSelect.getInstance($('#categories'));
+        let funding_round_types = f_instance.getSelectedValues();
+        let category_codes = c_instance.getSelectedValues();
+        
         if(cities){
-            let linkQuery = DB.linkQuery(yearMin, yearMax, cities, type);
+            let linkQuery = DB.linkQuery(yearMin, yearMax, cities, funding_round_types, category_codes, type);
             let linkResponse = DB.processQuery(linkQuery, DB.formatLinkData);
 
             let nodeQuery = DB.nodeQuery(linkQuery);

@@ -469,12 +469,43 @@
 
 
 
-	linkQuery(yearMin,yearMax, cities, network_type){
+	linkQuery(yearMin,yearMax, cities, funding_round_types, category_codes, network_type){
 		if(cities.length == 1){
 			cities = `(\'${cities[0]}\')`;
 		} else{
 			cities = cities.map(city => `\'${city}\'`);
 			cities = `(${cities.join(', ')})`;
+		}
+  
+  if (funding_round_types[0]== '') {
+		funding_round_types = [];
+		}
+		if (category_codes[0] == '') { 
+				category_codes = [];
+			}
+
+		if(funding_round_types.length == 0){
+		funding_round_types = 'IS NOT NULL';
+		}
+		else if(funding_round_types.length == 1){
+   
+			funding_round_types = `IN (\'${funding_round_types[0]}\')`;
+   
+		} else{
+			funding_round_types = funding_round_types.map(round => `\'${round}\'`);
+			funding_round_types = `IN (${funding_round_types.join(', ')})`;
+		}
+  
+		if(category_codes.length == 0){
+		category_codes = 'IS NOT NULL';
+		}
+		else if(category_codes.length == 1){
+   
+			category_codes = `IN (\'${category_codes[0]}\')`;
+   
+		} else{
+			category_codes = category_codes.map(code => `\'${code}\'`);
+			category_codes = `IN (${category_codes.join(', ')})`;
 		}
 
 		let query = `
@@ -493,6 +524,12 @@
 				WHERE (cb_objects_venture.city IN ${cities}) AND \
 				(STRFTIME('%Y', cb_funding_rounds.funded_at) BETWEEN \'${yearMin}\' AND \'${yearMax}\')
 			`;
+   if(funding_round_types){
+				query += ` AND (cb_funding_rounds.funding_round_type ${funding_round_types}) `;
+			}
+			if(category_codes){
+				query += ` AND (cb_objects_venture.category_code ${category_codes}) `;
+			}
 		}
 		else if(network_type === 'vc'){
 			console.log('link query: vc network');
