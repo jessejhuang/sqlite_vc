@@ -1,12 +1,14 @@
 class TimeSelector {
 
-    constructor(directoryChart,vcMap) {
+    constructor(directoryChart,vcMap, legendUpdate) {
                 
         this.dependentCharts = {
             vcMap : vcMap,
             directoryChart : directoryChart
         };
 
+        this.legendUpdate = legendUpdate;
+        
         this.margin = {top: 20, right: 100, bottom: 50, left: 200};
         this.width = 1200 - this.margin.left - this.margin.right;
         this.height = 300 - this.margin.top - this.margin.bottom;
@@ -122,7 +124,9 @@ class TimeSelector {
     update() {
         var self = this;
         let keys = Object.keys(self.lines);
-
+        
+        this.lineNameToColor = {};
+        
         let overallMax = 0;
         for(let i=0; i < keys.length; i++) {
             if (overallMax < self.lines[keys[i]]['max']) {
@@ -193,8 +197,10 @@ class TimeSelector {
                 .style("stroke-linecap", "round")
                 .style("stroke-linejoin", "round");
             // UPDATE DICTIONARY WITH LINE NAME -> COLORS
-            this.lineNameToColor[keys[i]] = this.lineColors[i]
+            this.lineNameToColor[keys[i]] = this.lineColors[i];
         }
+        
+        this.legendUpdate(this.lineNameToColor);
 
           context.append("g")
               .attr("class", "axis axis--x")
@@ -216,6 +222,7 @@ class TimeSelector {
 
     refreshMap(minYear, maxYear){
         var self = this;
+        
         self.dependentCharts.vcMap.changeYear(minYear, maxYear);
         self.dependentCharts.directoryChart.changeYear(minYear, maxYear);            
     }

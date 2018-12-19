@@ -43,6 +43,11 @@ body {
     width: 90%;
 }
 
+#legend{
+  height: 20vh;
+  overflow: scroll;
+}
+
 tbody {
   display:block;
   height:85vh;
