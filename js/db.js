@@ -509,11 +509,11 @@
 		}
 
 		let query = `
-			SELECT t.source, t.target, CAST(t.raised_amount as TEXT) as raised_amount FROM \
+			SELECT t.source, t.target, CAST(t.raised_amount as TEXT) as raised_amount, t.source_logo_url, t.target_logo_url FROM \
 				(SELECT cb_investments.investor_object_id, cb_investments.funded_object_id, \
 				 SUM(cb_funding_rounds.raised_amount) as raised_amount, \
 			STRFTIME('%Y', cb_funding_rounds.funded_at) as year, \
-			cb_objects_vc.name as source, cb_objects_venture.name as target \
+			cb_objects_vc.name as source, cb_objects_vc.logo_url as source_logo_url, cb_objects_venture.name as target, cb_objects_venture.logo_url as target_logo_url \
 			FROM cb_investments \
 			INNER JOIN cb_funding_rounds ON cb_investments.funding_round_id=cb_funding_rounds.id  \
 			INNER JOIN cb_objects as cb_objects_venture ON cb_investments.funded_object_id=cb_objects_venture.id  \
@@ -545,8 +545,9 @@
 			GROUP BY cb_investments.funded_object_id, cb_investments.investor_object_id, cb_funding_rounds.funded_at
 			ORDER BY raised_amount DESC) t LIMIT 40
 		`;
+  
+  console.log(query);
 		return query;
-		
 	}
 
 	formatLinkData(res){
@@ -573,9 +574,9 @@
 
 	nodeQuery(linkQuery){
 		let query = `
-			SELECT DISTINCT t.source, \"vc\" as type	
+			SELECT DISTINCT t.source, \"vc\" as type, t.source_logo_url	
 			FROM (${linkQuery}) t
-			UNION SELECT DISTINCT t.target, \"venture\" as type
+			UNION SELECT DISTINCT t.target, \"venture\" as type, t.target_logo_url
 			FROM (${linkQuery}) t
 			ORDER BY type
 		`;
@@ -591,7 +592,8 @@
 		for(let element of data){
 			let formatted_row = {
 				name: element[0],
-				type: element[1]
+				type: element[1],
+    logo_url: element[2]
 			};
 			nodes.push(formatted_row);
 		}

@@ -91,29 +91,62 @@ class NetworkGraph {
         //    .domain([0, maxValue])
         //    .range([2, 15]);
 
-        var node = svg.append("g")
-            .attr("class", "nodes")
-            .selectAll("circle")
-            .data(graph.nodes)
-            .enter().append("circle")
-            //.filter(function(d){return d.num > 0;})
-            .attr("r", function(d){
-                d.r = 20;
-                return d.r;
-            })
-            .attr("fill", function(d) {
+        //var node = svg.append("g")
+        //    .attr("class", "nodes")
+        //    .selectAll("circle")
+        //    .data(graph.nodes)
+        //    .enter().append("circle")
+        //    //.filter(function(d){return d.num > 0;})
+        //    .attr("r", function(d){
+        //        d.r = 20;
+        //        return d.r;
+        //    })
+        //    .attr("fill", function(d) {
+        //    
+        //        return self.color(d.type);
+        //    })
+        //    .attr("opacity","0.5")
+        //    .attr("stroke", function() {
+        //        return 'black';
+        //    })
+        //    .on('click',click)
+        //    .call(d3.drag()
+        //    .on("start", dragstarted)
+        //    .on("drag", dragged)
+        //    .on("end", dragended));
             
-                return self.color(d.type);
-            })
-            .attr("opacity","0.5")
-            .attr("stroke", function() {
-                return 'black';
-            })
+            
+            
+        
+        // Append images
+        var node = svg.append("g")
+            .attr("class", "images")
+            .selectAll("image")
+            .data(graph.nodes)
+            .enter().append("image")
+            .attr("xlink:href",  function(d) { return d.logo_url;})
             .on('click',click)
             .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
+        //node.enter().append("image")
+        //    .attr("xlink:href",  function(d) { return d.logo_url;})
+        //    .attr("x", function(d) { return -25;})
+        //    .attr("y", function(d) { return -25;})
+        //    .attr("height", 50)
+        //    .attr("width", 50);
+            
+        //var images = svg.append("g")
+        //    .attr("class", "node")
+        //    .selectAll("image")
+        //    .data(graph.nodes)
+        //    .enter().append("image")
+        //    .attr("xlink:href",  function(d) { return d.logo_url;})
+        //    .attr("x", function(d) { return -25;})
+        //    .attr("y", function(d) { return -25;})
+        //    .attr("height", 50)
+        //    .attr("width", 50);
             
         
             

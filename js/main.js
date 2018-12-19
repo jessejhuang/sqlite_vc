@@ -35,6 +35,7 @@ console.time("Main");
 
             let nodeQuery = DB.nodeQuery(linkQuery);
             let nodeResponse = DB.processQuery(nodeQuery, DB.formatNodeData);
+            console.log("node data: ", nodeResponse);
             
             Promise.all([linkResponse, nodeResponse])
                 .then(values => {
