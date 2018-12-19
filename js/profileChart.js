@@ -6,8 +6,13 @@ class ProfileChart {
         this.height = 300 - this.margin.top - this.margin.bottom;
         this.width_full = 1200;
         this.height_full = 300;
+        this.fontSize = 14;
         this.db = DB;
         this.modal = M.Modal.getInstance($('#profModal').modal());
+        d3.select('#exitProfModal')
+            .on('click', () => {
+                this.modal.close();
+            });
 
         this.headerSVG = d3.select('#profileHeader').append('svg')
             .attr('width', '100%')
@@ -40,7 +45,11 @@ class ProfileChart {
         this.tooltip = d3.tip()
             .attr('class', 'd3-tip')
             .direction('e')
-            .html((name, amount, date, type) => {
+            .html(d => {
+                let name = d.name;
+                let amount = d.amount;
+                let date = d.date;
+                let type = d.type;
                 let formatTime = d3.timeFormat("%B %d, %Y");
                 return `
                     <h4>${name}</h4>
@@ -155,11 +164,6 @@ class ProfileChart {
         let totalFunding = data.funding_total_usd
             ? data.funding_total_usd
             : '0';
-        let fundingType = data['cb_funding_rounds.funding_round_type']
-            ? data['cb_funding_rounds.funding_round_type'] !== 'other'
-                ? `Funding Type: ${data['cb_funding_rounds.funding_round_type']}`
-                : 'Funding Type: Wildcard'
-            : 'Funding Type: N/A'
         
         let funding = data['cb_funding_rounds.raised_amount_usd'];
 
@@ -196,7 +200,7 @@ class ProfileChart {
         }
     }
 
-    cdf(name, history){
+    cdf(history){
         let self = this;
         let sum = 0;
         let cumulative = [];
@@ -234,14 +238,16 @@ class ProfileChart {
             .curve(d3.curveBasis);
 
         self.cdfSVG.append('g')
-            .attr('transform', 'translate(70, 5)')
+            .attr('transform', 'translate(70, 25)')
+            .style('font', `${self.fontSize}px`)
             .call(yAxis);
         self.cdfSVG.append('g')
             .attr('transform', 'translate(70, 257)')
+            .style('font', `${self.fontSize}px`)
             .call(xAxis);
         self.cdfSVG.append('path')
             .attr('class', 'line')
-            .attr('transform', 'translate(71, 0)')
+            .attr('transform', 'translate(71, 8)')
             .datum(cumulative)
             .attr('d', valueline)
             .attr('stroke-width', '2px')
@@ -251,8 +257,57 @@ class ProfileChart {
             .style('stroke', 'black');
     }
 
-    bar(name, history){
-        
+    bar(history){
+        let self = this;
+        let bars = {}
+        for(let i = 0; i < history.length; i++){
+            if(!bars[history[i].funding_type]){
+                bars[history[i].funding_type] = 0;
+            }
+            bars[history[i].funding_type] += history[i].amount;
+        }
+        let rounds = [];
+        for(let key in bars){
+            rounds.push({
+                type: key,
+                amount: bars[key]
+            });
+        }
+        const xScale = d3.scaleBand()
+          .range([0, this.width])
+          .domain(rounds.map(d => d.type))
+          .padding(0.4);
+        const yScale = d3.scaleLinear()
+            .range([this.height, 0])
+            .domain([0, d3.max(rounds, d => d.amount)]);
+        const colors = d3.scaleOrdinal(d3.schemeCategory10) 
+
+        self.barSVG.selectAll('.profBar')
+            .data(rounds)
+            .enter()
+            .append('rect')
+                .attr('class', 'profBar')
+                .attr('x', d => xScale(d.type))
+                .attr('y', d => yScale(d.amount))
+                .attr('transform', 'translate(71, 8)')
+                .attr('width', xScale.bandwidth())
+                .attr('height', d => this.margin.top + this.height - yScale(d.amount) )
+                .style('fill', d => colors(d.type));
+
+        self.barSVG.append('g')
+            .attr('transform', 'translate(70, 257)')
+            .style('font', `${self.fontSize}px`)
+            .call(d3.axisBottom(xScale));
+
+        self.barSVG.append('g')
+            .attr('transform', 'translate(70, 27)')
+            .style('font', `${self.fontSize}px`)
+            .call(d3.axisLeft(yScale));
+        // let fundingType = data['cb_funding_rounds.funding_round_type']
+        //     ? data['cb_funding_rounds.funding_round_type'] !== 'other'
+        //         ? `Funding Type: ${data['cb_funding_rounds.funding_round_type']}`
+        //         : 'Funding Type: Wildcard'
+        //     : 'Funding Type: N/A'
     }
 
     scatter(name, history){
@@ -273,9 +328,11 @@ class ProfileChart {
         const colors = d3.scaleOrdinal(d3.schemeCategory10)
         self.scatterSVG.append('g')
             .attr('transform', 'translate(70, 5)')
+            .style('font', `${self.fontSize}px`)
             .call(yAxis);
         self.scatterSVG.append('g')
             .attr('transform', 'translate(70, 257)')
+            .style('font', `${self.fontSize}px`)
             .call(xAxis);
         self.scatterSVG.selectAll('.profScatterDot')
             .data(history)
@@ -287,7 +344,13 @@ class ProfileChart {
                 .attr('cy', d => yScale(d.amount ? d.amount : 0))
                 .attr('transform', 'translate(71, 0)')
                 .on('mouseover', d => {
-                    self.tooltip.show(name, d.amount, d.type, d.date);
+                    let datum = {
+                        name,
+                        amount: d.amount,
+                        type: d.type,
+                        date: d.date,
+                    }
+                    self.tooltip.show(datum, self.scatterSVG);
                 })
                 .on('mouseout', () => {
                     self.tooltip.hide();
@@ -307,9 +370,9 @@ class ProfileChart {
                 self.summary(data);
                 let history = data.history;
                 console.log(`Name: ${name}, `, history);
-                self.bar(name, history);
+                self.bar(history);
                 self.scatter(name, history);
-                self.cdf(name, history);
+                self.cdf(history);
                 self.modal.open();
             }, err => {
                 console.log(err);
