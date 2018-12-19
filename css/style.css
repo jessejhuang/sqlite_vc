@@ -1,10 +1,7 @@
 body {
     font: 14px sans-serif;
 }
-/*.map {
-    width: 100%;
-    display: inline-block;
-}*/
+
 .sideBar {
     width: 25%;
     float:right;
@@ -29,15 +26,10 @@ body {
     fill: black;
     font-weight: 600;
 }
+
 .datetext{
     text-anchor: middle;
     font-size: 0.5vh;
-}
-
-#timeSelector {
-  margin: auto;
-  width: 50%;
-  padding: 50px;
 }
 
 #profModal {
