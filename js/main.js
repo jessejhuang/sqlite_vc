@@ -146,7 +146,7 @@ console.time("Main");
             let funding_round_types = f_instance.getSelectedValues();
             let catagory_codes= c_instance.getSelectedValues();
 
-            self.directoryChart.cities = [];
+            directoryChart.cities = [];
             directoryChart.update();
             // self.directoryChart.cities = self.selectedCities;
             // self.directoryChart.update();

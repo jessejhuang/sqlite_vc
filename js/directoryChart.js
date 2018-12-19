@@ -54,7 +54,7 @@ class DirectoryChart {
 
 			// Remove old table
 			//$("#transaction-list thead").remove();
-			//$("#transaction-list tr").remove();
+			$("#transaction-list tbody tr").remove();
 
 			let query = self.DB.directoryQuery(years, self.cities, funding_round_types, catagory_codes);
 			if(self.cities.length !== 0){
@@ -71,7 +71,7 @@ class DirectoryChart {
 						//let header = "<thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>"
 						//$("#transaction-list").append(header);
 
-						let maxRows = Math.min(50, directoryData.length);
+						let maxRows = Math.min(150, directoryData.length);
 						for (let i=0; i < maxRows; i++) {
 							console.log(directoryData[i]);
                  			markup = "<tr>";
