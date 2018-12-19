@@ -40,11 +40,17 @@ body {
 
 
 #transactions-table{
-     /*width: 800px;
-     height: 900px;*/
+
      height: 87vh;
      overflow: scroll;
 }
+
+#networkGraph{
+
+     height: 87vh;
+  
+}
+
 #profModal {
     height: 100%;
     width: 90%;
@@ -55,6 +61,12 @@ body {
   height: 60vh;
   overflow: scroll;
 }
+
+#profSummary{
+    height: 30vh;
+    overflow: scroll;
+    hyphens: auto;
+  }
 
 tbody {
   display:block;

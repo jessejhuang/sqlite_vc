@@ -6,7 +6,8 @@ class NetworkGraph {
         //d3.select('#networkGraph').html('NETWORK');
         
         this.width = 1500;
-        this.height = 1000;
+        this.height = 1200;
+        
        
         this.svg = d3.select("#networkGraph").append("svg")
             .attr("preserveAspectRatio", "xMinYMin meet")
@@ -45,7 +46,7 @@ class NetworkGraph {
         //console.log('network graph update: ', data);
         
         self.data = JSON.parse(data);
-        self.updateProfile();
+        
         
         var graph = self.data;
     
@@ -108,14 +109,13 @@ class NetworkGraph {
             .attr("stroke", function() {
                 return 'black';
             })
+            .on('click',click)
             .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
-            .on("end", dragended))
+            .on("end", dragended));
             
-        //node
-        //    .enter().append("title")
-        //    .text(function(d) {return d.title;});
+        
             
     
         
@@ -133,11 +133,16 @@ class NetworkGraph {
             .attr("fill", function() {
             return "black";
             })
+            .on('click',click)
             .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
             .on("end", dragended));
-
+        
+        function click(d) {
+            console.log("clicked: ", d.name);
+            self.updateProfile(d.name);
+        }
 
         //Simulation update and viewport binding behaivior
         simulation.on("tick", function ticked() {
@@ -188,15 +193,15 @@ class NetworkGraph {
 
     }
     
-    updateProfile(){
+    updateProfile(name){
         var self = this;
         //if no slection, make profile display info on the new selection
         //if selection, revert profile back to default display for self.data.type = "city" or = "entity"
       
-        self.selected = {"type":"clicked type", "value":"clicked name"};
+        //self.selected = {"type":"clicked type", "value":"clicked name"};
         // Update profile chart                                     
         let profileData = JSON.stringify(self.selected);
-        // self.profileChart.update(profileData);
+        self.profileChart.update(name);
     }
     
 
