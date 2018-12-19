@@ -15,6 +15,7 @@ class TimeSelector {
         this.width_full = 1200;
         this.height_full = 300;
         this.current = '2013';
+        this.operation = 'SUM'
 
         this.lineNameToColor = new Object();
 
@@ -199,13 +200,17 @@ class TimeSelector {
                 .style("font", "26px Product Sans")
                 .call(yAxis
                     .tickFormat(function(d) { 
-                        if (d==0) {
-                            return("$0")
-                        }
-                        if(d > 999999999) {
-                            return("$" + (d/1000000000) + " B");
+                        if (self.operation=="SUM") {
+                            if (d==0) {
+                                return("$0")
+                            }
+                            if(d > 999999999) {
+                                return("$" + (d/1000000000) + " B");
+                            } else {
+                                return("$" + (d/1000000) + " M");
+                            }
                         } else {
-                            return("$" + (d/1000000) + " M");
+                            return(d)
                         }})
                     .ticks(4));
 

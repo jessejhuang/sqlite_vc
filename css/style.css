@@ -98,3 +98,13 @@ td{
     position: absolute;
     right: 75px;
 }
+
+#counts {
+    position: absolute;
+    right: 250px;
+}
+
+#sums {
+    position: absolute;
+    right: 75px;
+}

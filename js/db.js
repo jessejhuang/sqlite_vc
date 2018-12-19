@@ -160,7 +160,7 @@
 		return cities;
 	}
 
-	lineQuery(funding_round_type=[], category_code=[], city='None') {
+	lineQuery(funding_round_type=[], category_code=[], city='None', operation="SUM") {
   
 		if (funding_round_type[0]== '') {
 			funding_round_type = [];
@@ -185,7 +185,7 @@
 		let query = "";
 
 		//  Nested query
-		query += "SELECT SUM(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'"
+		query += "SELECT " + operation + "(raised_amount), strftime(\'%Y\', t.funded_at) as 'year'"
 
 		if (processFundingRound) {
 			query += ", funding_round_type"

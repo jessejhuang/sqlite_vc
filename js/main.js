@@ -118,17 +118,14 @@ console.time("Main");
 
         // On filter, retrieve new data
         function updateLine() {
-
+            let operation = timeSelector.operation;
             var f_instance = M.FormSelect.getInstance($('#fundingType'));
             var c_instance = M.FormSelect.getInstance($('#categories'));
 
             let funding_round_types = f_instance.getSelectedValues();
             let catagory_codes= c_instance.getSelectedValues();
-            
-            //console.log("funding types: ", funding_round_types);
-            //console.log("catagory types: ", catagory_codes);
 
-            query = DB.lineQuery(funding_round_types, catagory_codes);
+            query = DB.lineQuery(funding_round_types, catagory_codes, 'None', operation);
             DB.processQuery(query, DB.formatLineData)
                 .then(e => {
                     lineData = e;
@@ -153,24 +150,6 @@ console.time("Main");
 
             directoryChart.cities = [];
             directoryChart.update();
-            // self.directoryChart.cities = self.selectedCities;
-            // self.directoryChart.update();
-
-            //console.log("funding types: ", funding_round_types);
-            //console.log("catagory types: ", catagory_codes);
-
-
-            // query = DB.lineQuery(funding_round_types, catagory_codes);
-            // DB.processQuery(query, DB.formatLineData)
-            //     .then(e => {
-            //         lineData = e;
-            //         // timeSelector.initiate(lineData);
-            //     }) 
-            //     .then(() => {
-            //         timeSelector.update();
-            //     }, err => {
-            //         console.log(err);
-            //     });
         }
 
 
@@ -190,11 +169,19 @@ console.time("Main");
         $('#logScaling').click( function() {
             vcMap.changeScale("log");
         });
-        
 
-        // .on('click', vcMap.changeScale('linear'));
-        // $('#logScaling').on('click', vcMap.changeScale('log'));
 
+        $('#counts').click( function() {
+            timeSelector.operation = "COUNT"
+            updateLine();
+            // timeSelector.changeScale("linear");
+        });
+        $('#sums').click( function() {
+            timeSelector.operation = "SUM"
+            updateLine();
+            // timeSelector.changeScale("log");
+        });
+    
         
     }
 
