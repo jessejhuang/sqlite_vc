@@ -136,10 +136,44 @@ console.time("Main");
                 });
         }
 
+
+        // On filter, retrieve new data
+        function updateTransactionList() {
+
+            var f_instance = M.FormSelect.getInstance($('#fundingType'));
+            var c_instance = M.FormSelect.getInstance($('#categories'));
+
+            let funding_round_types = f_instance.getSelectedValues();
+            let catagory_codes= c_instance.getSelectedValues();
+
+            self.directoryChart.cities = [];
+            directoryChart.update();
+            // self.directoryChart.cities = self.selectedCities;
+            // self.directoryChart.update();
+
+            //console.log("funding types: ", funding_round_types);
+            //console.log("catagory types: ", catagory_codes);
+
+
+            // query = DB.lineQuery(funding_round_types, catagory_codes);
+            // DB.processQuery(query, DB.formatLineData)
+            //     .then(e => {
+            //         lineData = e;
+            //         // timeSelector.initiate(lineData);
+            //     }) 
+            //     .then(() => {
+            //         timeSelector.update();
+            //     }, err => {
+            //         console.log(err);
+            //     });
+        }
+
+
         function filterUpdates() {
             console.log("Filter Updates");
             updateMap();
             updateLine();
+            updateTransactionList();
         }
         
         $('select').formSelect($('select').on('change', filterUpdates));  

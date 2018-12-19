@@ -49,8 +49,14 @@ class DirectoryChart {
 				years.push(j);
 			}
 			// console.log(years);
+			console.log("dir cities:");
+			console.log(self.cities);
 
-			let query = self.DB.directoryQuery(years, [self.cities], [funding_round_types], [catagory_codes]);
+			// Remove old table
+			$("#transaction-list thead").remove();
+			$("#transaction-list tr").remove();
+
+			let query = self.DB.directoryQuery(years, self.cities, funding_round_types, catagory_codes);
 			if(self.cities.length !== 0){
 				console.log("min year: " + this.current);
 				console.log("max year: " + this.maxYear);
@@ -59,13 +65,13 @@ class DirectoryChart {
 						let directoryData = JSON.parse(JSON.stringify(e)).sort();
 						let markup;
 						//$("#transaction-list thead").remove();
-						$("#transaction-list tbody").empty();
+						// $("#transaction-list tbody").empty();
 
 						// Header
 						//let header = "<thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>"
 						//$("#transaction-list").append(header);
 
-						let maxRows = 100;
+						let maxRows = Math.min(50, directoryData.length);
 						for (let i=0; i < maxRows; i++) {
 							console.log(directoryData[i]);
                  			markup = "<tr>";
