@@ -43,14 +43,10 @@ class NetworkGraph {
     
     update(data) {
         var self = this;
-        //console.log('network graph update: ', data);
         
         self.data = JSON.parse(data);
         
-        
         var graph = self.data;
-    
-   
         
         graph.nodes.forEach(function(nodes){
         
@@ -140,7 +136,6 @@ class NetworkGraph {
             .on("end", dragended));
         
         function click(d) {
-            console.log("clicked: ", d.name);
             self.updateProfile(d.name);
         }
 

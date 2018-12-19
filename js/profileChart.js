@@ -119,7 +119,6 @@ class ProfileChart {
 
     summary(data){
         let self = this;
-        console.log('summary: ', data)
         let companyType = data.entity_type === 'FinancialOrg' ? 'Entity Type: VC Firm' :
             data.entity_type === 'People' ? 'Entity Type: Person' :
             'Entity Type: Venture';
@@ -135,17 +134,14 @@ class ProfileChart {
 
         let matches;
         matches = yearFounded.match(/\d+/g)
-        console.log("year found matches: " + matches);
         if(matches){
             yearFounded = matches[0]
         }
         matches = firstYear.match(/\d+/g)
-        console.log("firstYear found matches: " + matches);
         if(matches){
             firstYear = matches[0]
         }
         lastYear = lastYear.match(/\d+/g)
-        console.log("lastYear found matches: " + matches);
         if(matches){
             yearFounded = matches[0]
         }
@@ -383,7 +379,6 @@ class ProfileChart {
             .then(data => {
                 self.summary(data);
                 let history = data.history;
-                console.log(`Name: ${name}, `, history);
                 self.bar(history);
                 self.scatter(name, history);
                 self.cdf(history);

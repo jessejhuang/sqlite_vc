@@ -27,7 +27,6 @@ class CitySummary {
 
         for (let i=0; i < lineNames.length; i++) { 
             // Next line: a list of dicitonaries [{year:----, amount:-----}, {year:----, amount:-----}, {year:----, amount:-----}]
-            // console.log("next data");
             nextLine = this.formatLine(data[lineNames[i]]);
             formattedLines[lineNames[i]] = nextLine
         }
@@ -124,17 +123,6 @@ class CitySummary {
                 .attr("preserveAspectRatio", "xMinYMin meet")
                 .attr("viewBox", "0 0 "+this.width_full+" "+this.height_full)
                 .attr("align","center");
-        // Brush
-        // function brushed() {
-        //     let s = d3.event.selection;
-        //     let min = Math.ceil(xScale.invert(s[0]));
-        //     let max = Math.floor(xScale.invert(s[1]));
-        //     self.refreshMap(min, max);
-        // }
-
-        // let brush = d3.brushX()
-        //     .extent([[0, 0], [self.margin.left + self.width, self.margin.top + self.height]])
-        //     .on("brush end", brushed); 
 
         let line = d3.line()
             .x(function (d) { 
@@ -196,16 +184,5 @@ class CitySummary {
                     }})
                     .ticks(4));
 
-          // context.append("g")
-          //     .attr("class", "brush")
-          //     .call(brush)
-          //     .call(brush.move, xScale.range());
     }
-
-    // refreshMap(minYear, maxYear){
-    //     var self = this;
-    //     self.dependentCharts.vcMap.changeYear(minYear, maxYear);
-    //     self.dependentCharts.directoryChart.changeYear(minYear, maxYear);            
-    // }
-
 }

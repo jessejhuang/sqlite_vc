@@ -1,7 +1,6 @@
 /*
  * Root file that handles instances of all the charts and loads the visualization
  */
-console.time("Main");
 (function(){
     /**
      * Creates instances for every chart (classes created to handle each chart);
@@ -52,7 +51,6 @@ console.time("Main");
     
     function legendUpdate(data){
         let colorTable = data;
-        console.log("ColorTable: ", colorTable);
         $("#legend").html('');
         $( "#legend" ).append( "<ul id='legend-body'></ul>" );
         
@@ -98,9 +96,6 @@ console.time("Main");
 
             let funding_round_types = f_instance.getSelectedValues();
             let catagory_codes = c_instance.getSelectedValues();
-            
-            //console.log("funding types: ", funding_round_types);
-            //console.log("catagory types: ", catagory_codes);
             
             let query = DB.mapQuery(funding_round_types, catagory_codes);
             DB.processQuery(query, DB.formatMapData)
@@ -154,7 +149,6 @@ console.time("Main");
 
 
         function filterUpdates() {
-            console.log("Filter Updates");
             updateMap();
             updateLine();
             updateTransactionList();
@@ -224,5 +218,4 @@ console.time("Main");
     });
     
 })();
-console.timeEnd("Main");
 // EOF

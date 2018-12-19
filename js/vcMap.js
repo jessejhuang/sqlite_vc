@@ -1,10 +1,8 @@
 class VCMap {
     constructor(directoryChart,networkGraph, networkUpdate,DB) {
-        // console.log("On construction: " + DB);
 
         this.networkUpdate = networkUpdate;
         this.networkGraph = networkGraph;
-        //this.DB = new Database();
         this.DB = DB;
         this.directoryChart = directoryChart;
         this.margin = {top: 20, right: 20, bottom: 30, left: 50};
@@ -306,8 +304,6 @@ class VCMap {
 
     changeScale(scaleType) {
         var self = this;
-        console.log("self...")
-        console.log(self)
         if (scaleType=="linear") {
             self.scale = d3.scaleLinear()
             .domain([1000, 10000000000])

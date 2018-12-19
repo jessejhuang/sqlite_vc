@@ -32,8 +32,6 @@
 		let self = this;
 		return new Promise((resolve, reject) => {
 			self.db.then(database => {
-				//console.log('Process Query: ');
-				//console.log(query);
 				let response = database.exec(query);
 				if (formatFunction){
 					resolve(formatFunction(response));
@@ -126,8 +124,6 @@
 		//Sort
 		query += ' ORDER BY cb_objects_venture.city, year';
 		query += ';';
-		// console.log("map query")
-  		// console.log(query);
 		return query;
 	}
 
@@ -168,9 +164,6 @@
 		if (category_code[0] == '') { 
 			category_code = [];
 		}
-
-		//console.log(funding_round_type);
-		//console.log(category_code);
   
 		let processFundingRound =true;
 		let processCategoryCode =true;
@@ -291,17 +284,11 @@
 
 		//  Finish
 		query += ";";
-		// console.log("Line query")
-		// console.log(query);
 		return(query);
 	}
 
 
 	formatLineData(res) {
-		// console.log("\n\n\n\n\nres");
-		// console.log(res);
-		// console.log(res['0']['columns'].length)
-		// console.log(Object.keys(res));
 		let lines = new Object();
 		let curLine = [];
 		let dataPoint;
@@ -314,7 +301,6 @@
 		if (res['0']['columns'].length==3) { curName = res['0']['values'][0][2]; }
 		if (res['0']['columns'].length==4) { curName = res['0']['values'][0][2] + ", " + res['0']['values'][0][3]; }
 
-		// console.log(curName);
 		// Process lines one by one (1 for each funding type category type combination)
 		for (let i=0; i < res['0']['values'].length; i++) {
 			// Update current name of line being processed
@@ -342,8 +328,6 @@
 		}
 
 		lines = JSON.stringify(lines)
-		// console.log(lines);
-		// return("ay")
 		return(lines);
 	}
 
@@ -365,8 +349,6 @@
 
 
 	directoryQuery(years, cities, funding_round_types, category_codes){
-		// console.log("cities");
-		// console.log(cities);
 		let query = '';
 		query += 'SELECT funded_at, funded_object.name, investor_object.name, funded_object.category_code, cb_funding_rounds.raised_amount_usd, funded_object.state_code, funded_object.city, cb_funding_rounds.funding_round_type'
 		
@@ -398,8 +380,6 @@
 			query += "\nAND\nfunded_object.city in ("
 
 			for (let i=0; i < cities.length; i++) {
-				// console.log("next city");
-				// console.log(cities[i]);
 				query += "\'" + cities[i] + "\'"
 				if (i < cities.length-1) {
 					query += ", "
@@ -438,8 +418,6 @@
 
 		query += "\ORDER BY cb_funding_rounds.raised_amount_usd DESC, funded_at DESC;"
 
-		// console.log("dir query");
-		// console.log(query);
 		return query;
 	}
 
@@ -449,8 +427,6 @@
 		let columnNames = ["Funded at", "Funded entity", "Investor", "Category", "Raised amount", "State", "City", "Funding round"]
 
 		let processedData = [];
-		// console.log("res");
-		// console.log(res);
 		let data = res['0']['values'];
 		let nextDataPoint;
 		let nextDict;
@@ -465,7 +441,6 @@
 			}
 			processedData.push(nextDict);
 		}
-		// console.log(processedData)
 		return(processedData)
 	}
 
@@ -553,7 +528,6 @@
 	}
 
 	formatLinkData(res){
-		//console.log('format link data:', res);
 		var data = [];
 		if(res[0] !== undefined){
 			data = res[0].values;
@@ -569,8 +543,6 @@
 			};
 			links.push(formatted_row);
 		}
-		//console.log('format link data raw link: ', rows);
-		//console.log('format link data: links: ', links);
 		return links;
 	}
 
@@ -598,7 +570,6 @@
 			};
 			nodes.push(formatted_row);
 		}
-		//console.log('Format Node Data nodes: ', nodes);
 		return nodes;
 	}
 
@@ -678,7 +649,6 @@
 				funding_type: data[i][typeIndex]
 			});
 		}
-		console.log('format Profile data: ', companyInfo);
 		return companyInfo;
 	}
 

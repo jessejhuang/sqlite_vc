@@ -35,7 +35,6 @@ class TimeSelector {
 
         for (let i=0; i < lineNames.length; i++) { 
             // Next line: a list of dicitonaries [{year:----, amount:-----}, {year:----, amount:-----}, {year:----, amount:-----}]
-            // console.log("next data");
             nextLine = this.formatLine(data[lineNames[i]]);
             formattedLines[lineNames[i]] = nextLine
         }

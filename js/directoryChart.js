@@ -55,8 +55,6 @@ class DirectoryChart {
 
 			let query = self.DB.directoryQuery(years, self.cities, funding_round_types, catagory_codes);
 			if(self.cities.length !== 0){
-				console.log("min year: " + this.current);
-				console.log("max year: " + this.maxYear);
 				self.DB.processQuery(query, self.DB.formatDirectoryData)
 					.then(e => {
 						let directoryData = JSON.parse(JSON.stringify(e)).sort();
@@ -82,7 +80,6 @@ class DirectoryChart {
 								raisedAmount = Math.round(raisedAmount * 10) / 10;
 								raisedAmount = ("$" + raisedAmount + "M");
 							}
-							console.log('raised amounts: ', raisedAmount)
 							markup = `
 								<tr>	
 									<td>${directoryData[i]['Funded at']}										 </td>
@@ -105,42 +102,6 @@ class DirectoryChart {
 									self.profileChart.update(directoryData[i]['Investor']);
 								});
 						}
-
-// Category: "web"
-// City: "San Francisco"
-// Funded at: "2007-08-01"
-// Funded entity: "FFWD Wheels"
-// Funding round: "series-a"
-// Investor: "Draper Fisher Jurvetson (DFJ)"
-// Raised amount: 1700000
-// State: "CA"
-						// console.log("ayyy");
-						// console.log(directoryData);
-						// self.svg.attr('height', d3.max([500, directoryData.length * 20]));
-						
-
-
-					// 	d3.select('#directoryChart').selectAll('tspan')
-					// 		.data(directoryData)
-					// 		.enter()
-					// 		.append('tspan')
-					// 			.text(d => `${d.name}`)
-					// 			.attr('x', 0)
-					// 			.attr('dy', 20)
-					// 			.on('click', d => {
-					// 				self.profileChart.directoryUpdate(d);
-					// 			})
-					// 			.style('fill', d => {
-					// 				if(d.entity_type === 'Company'){
-					// 					return '#d9e4f3';
-					// 				}
-					// 				else{
-					// 					return '#93bad7';
-					// 				}
-					// 			});
-					// }, err => {
-					// 	console.log(err);
-					// }
 				})
 			}
     }
