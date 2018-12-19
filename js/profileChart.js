@@ -1,7 +1,11 @@
 class ProfileChart {
 
     constructor(DB) {
-        this.height = 550;
+        this.margin = {top: 20, right: 100, bottom: 50, left: 200};
+        this.width = 1200 - this.margin.left - this.margin.right;
+        this.height = 300 - this.margin.top - this.margin.bottom;
+        this.width_full = 1200;
+        this.height_full = 300;
         this.db = DB;
         this.modal = M.Modal.getInstance($('#profModal').modal());
 
@@ -16,19 +20,38 @@ class ProfileChart {
             .attr('id', 'profSummarySVG');
 
         this.cdfSVG = d3.select('#profCDF').append('svg')
-            .attr('width', '100%')
-            .attr('height', '100%')
-            .attr('id', 'profCdfSVG');
+            .attr('id', 'profCdfSVG')
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 "+this.width_full+" "+this.height_full)
+            .attr("align","center");
 
         this.barSVG = d3.select('#profBar').append('svg')
-            .attr('width', '100%')
-            .attr('height', '100%')
-            .attr('id', 'profBarSVG');
+            .attr('id', 'profBarSVG')
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 "+this.width_full+" "+this.height_full)
+            .attr("align","center");
 
         this.scatterSVG = d3.select('#profScatter').append('svg')
-            .attr('width', '100%')
-            .attr('height', '100%')
-            .attr('id', 'profLineSVG');
+            .attr('id', 'profLineSVG')
+            .attr("preserveAspectRatio", "xMinYMin meet")
+            .attr("viewBox", "0 0 "+this.width_full+" "+this.height_full)
+            .attr("align","center");
+
+        this.tooltip = d3.tip()
+            .attr('class', 'd3-tip')
+            .direction('e')
+            .html((name, amount, date, type) => {
+                let formatTime = d3.timeFormat("%B %d, %Y");
+                return `
+                    <h4>${name}</h4>
+                    <p>Fund type: ${type}</p>
+                    <p>Date of Transaction: ${formatTime(date)}</p>
+                    <p>Amount: $${amount}</p>
+                `;
+            });
+        this.cdfSVG.call(this.tooltip);
+        this.barSVG.call(this.tooltip);
+        this.scatterSVG.call(this.tooltip);
 
         this.y1 = 10; // Starting y value for data attribute
         this.initiate();
@@ -173,58 +196,121 @@ class ProfileChart {
         }
     }
 
-    cdf(history){
+    cdf(name, history){
+        let self = this;
+        let sum = 0;
+        let cumulative = [];
+        const parseDate = d3.timeParse('%Y-%m-%d');
+        let dates = history.map(d => parseDate(d.date));
+        for(let i = 0; i < history.length; i++){
+            if(history[i].amount){
+                sum += history[i].amount;
+                // let year = history[i].date.match(/\d+/g)[0];
+                cumulative.push({
+                    amount: sum,
+                    type: history[i].type,
+                    // year: +year
+                    date: history[i].date
+                });
+            }
+        }
+
+        // let years = cumulative.map(d => d.year);
+        let amounts = cumulative.map(d => d.amount);
+        let xScale = d3.scaleTime()
+            .domain([d3.min(dates), d3.max(dates)])
+            .range([0, this.width]); 
+
+        let yScale = d3.scaleLinear()
+            .domain([0, d3.max(amounts)])
+            .range([this.margin.top+this.height, this.margin.top]);
+
+        let xAxis = d3.axisBottom().scale(xScale).ticks(5);
+        let yAxis = d3.axisLeft().scale(yScale).ticks(5);
+        const colors = d3.scaleOrdinal(d3.schemeCategory10)
+        let valueline = d3.line()
+            .x(d => xScale(parseDate(d.date)))
+            .y(d => yScale(d.amount))
+            .curve(d3.curveBasis);
+
+        self.cdfSVG.append('g')
+            .attr('transform', 'translate(70, 5)')
+            .call(yAxis);
+        self.cdfSVG.append('g')
+            .attr('transform', 'translate(70, 257)')
+            .call(xAxis);
+        self.cdfSVG.append('path')
+            .attr('class', 'line')
+            .attr('transform', 'translate(71, 0)')
+            .datum(cumulative)
+            .attr('d', valueline)
+            .attr('stroke-width', '2px')
+            .attr('fill', 'none')
+            .style('stroke-linecap', 'round')
+            .style('stroke-linejoin', 'round')
+            .style('stroke', 'black');
+    }
+
+    bar(name, history){
         
     }
 
-    bar(history){
-        
-    }
-
-    scatter(history){
+    scatter(name, history){
         let self = this;
         const parseDate = d3.timeParse('%Y-%m-%d');
         let dates = history.map(d => parseDate(d.date));
         let amounts = history.map(d => d.amount);
         let xScale = d3.scaleTime()
             .domain([d3.min(dates), d3.max(dates)])
-            .range([0, 700]);
+            .range([0, this.width]); 
+
         let yScale = d3.scaleLinear()
             .domain([0, d3.max(amounts)])
-            .range([0, 130]);
-        let xAxis = d3.axisBottom().scale(xScale);
-        let yAxis = d3.axisLeft().scale(yScale);
+            .range([this.margin.top+this.height, this.margin.top]);
+
+        let xAxis = d3.axisBottom().scale(xScale).ticks(5);
+        let yAxis = d3.axisLeft().scale(yScale).ticks(5);
         const colors = d3.scaleOrdinal(d3.schemeCategory10)
         self.scatterSVG.append('g')
-            .attr('transform', 'translate(50, -10)')
+            .attr('transform', 'translate(70, 5)')
             .call(yAxis);
         self.scatterSVG.append('g')
-            .attr('transform', 'translate(65, 130)')
+            .attr('transform', 'translate(70, 257)')
             .call(xAxis);
         self.scatterSVG.selectAll('.profScatterDot')
             .data(history)
             .enter()
             .append('circle')
-            .attr('class', '.profScatterDot')
-            .attr('r', 3.5)
-            .attr('cx', d => xScale(parseDate(d.date)))
-            .attr('cy', d => yScale(d.amount ? d.amount : 0))
-            .attr('transform', 'translate(45, -40)')
-            .style('fill', d => colors(d.fundingType));
+                .attr('class', '.profScatterDot')
+                .attr('r', 10)
+                .attr('cx', d => xScale(parseDate(d.date)))
+                .attr('cy', d => yScale(d.amount ? d.amount : 0))
+                .attr('transform', 'translate(71, 0)')
+                .on('mouseover', d => {
+                    self.tooltip.show(name, d.amount, d.type, d.date);
+                })
+                .on('mouseout', () => {
+                    self.tooltip.hide();
+                })
+                .style('fill', d => colors(d.fundingType))
+
     }
 
     update(name) {
         let self = this;
-        self.modal.open();
+        self.scatterSVG.selectAll('*').remove();
+        self.barSVG.selectAll('*').remove();
+        self.cdfSVG.selectAll('*').remove();
         let query = self.db.profileQuery(name);
         self.db.processQuery(query, self.db.formatProfileData)
             .then(data => {
                 self.summary(data);
                 let history = data.history;
                 console.log(`Name: ${name}, `, history);
-                self.bar(history);
-                self.scatter(history);
-                self.cdf(history);
+                self.bar(name, history);
+                self.scatter(name, history);
+                self.cdf(name, history);
+                self.modal.open();
             }, err => {
                 console.log(err);
             });

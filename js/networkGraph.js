@@ -111,7 +111,7 @@ class NetworkGraph {
             .call(d3.drag()
             .on("start", dragstarted)
             .on("drag", dragged)
-            .on("end", dragended));
+            .on("end", dragended))
             
         //node
         //    .enter().append("title")

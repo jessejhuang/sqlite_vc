@@ -67,18 +67,29 @@ class DirectoryChart {
 
 						let maxRows = 100;
 						for (let i=0; i < maxRows; i++) {
-							// console.log(directoryData[i]);
-                 			markup = "<tr>";
-                 			markup += "<td>" + directoryData[i]['Funded at'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['Funded entity'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['Investor'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['Raised amount'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['Category'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['Funding round'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['State'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['City'] + "</td>"
-                 			markup += "</tr>"                 			
-                 			$("table tbody").append(markup);
+							let entityId = `entity${i}`
+							let investorId = `investor${i}`
+							markup = `
+								<tr>	
+									<td>${directoryData[i]['Funded at']}										 </td>
+									<td id="${entityId}">${directoryData[i]['Funded entity']}</td>
+									<td id="${investorId}">${directoryData[i]['Investor']}	 </td>
+									<td>${directoryData[i]['Raised amount']}								 </td>
+									<td>${directoryData[i]['Category']}											 </td>
+									<td>${directoryData[i]['Funding round']}							   </td>
+									<td>${directoryData[i]['State']}												 </td>
+									<td>${directoryData[i]['City']}													 </td>
+								</tr>
+							`;
+							$("table tbody").append(markup);
+							d3.select(`#${entityId}`)
+								.on('click', () => {
+									self.profileChart.update(directoryData[i]['Funded entity']);
+								});
+							d3.select(`#${investorId}`)
+								.on('click', () => {
+									self.profileChart.update(directoryData[i]['Investor']);
+								});
 						}
 
 // Category: "web"
