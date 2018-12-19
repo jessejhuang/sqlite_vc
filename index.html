@@ -86,38 +86,58 @@
                                
                             </select>
                             </li>
-                        </ul> 
+                            
+                            <li id="legend">
+                                
+                            </li>
+                        
+                        </ul>
+                        
+                        
                     </div>
                     
                     <div class= "col s9" >
-                        <div id="timeSelector">
-                        </div>
+                        <ul>
+                            <li>
+                                <div id="timeSelector">
+                                </div>
+                            </li>
+                            <li>
+                                
+                                <div id="vcMap" ></div>
+                                
+                            </li>
+                        </ul>
                     </div>
                 </div>
-                <div class="row">
+                <!--<div class="row">
                     <div class="col s9 offset-s3">
                         <div id="vcMap" ></div>
                     </div>
-                </div>
+                </div>-->
                 
                 <div class="row">
-                    <div class="col s3">
-                        <h3>Transactions</h3>
-
+                    <div class="col s4">
+                        <ul>
+                        <h4>Transactions</h4>
+                        </ul>
+                        <ul>
                         <div id="transactions-table">
+                            
                             <table id="transaction-list" class = "striped bordered">
-   
+                                <thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>
                                  <tbody id="rowsHere">
                                 </tbody>
                              </table>
                          </div>
+                        </ul>
 
 
-                        <div id="directory">
+                      <!--  <div id="directory">
                             <div id="org-list"></div>
-                        </div>
+                        </div>-->
                     </div>
-                    <div class="col s9">
+                    <div class="col s8">
                          <div id="networkGraph"></div>
                     </div>
                 </div>
@@ -165,6 +185,7 @@
     <script src="js/lib/sql.js"></script>
     <script src="js/db.js"></script>
     <script src="js/helpers.js" async defer></script>
+    <script src="js/citySummary.js" async defer></script>
     <script src="js/vcMap.js" async defer></script>
     <script src="js/timeSelector.js" async defer></script>
     <script src="js/profileChart.js" async defer></script>

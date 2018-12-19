@@ -34,12 +34,39 @@ body {
 
 
 #transactions-table{
-     width: 800px;
-     height: 900px;
-     overflow: auto;
+     /*width: 800px;
+     height: 900px;*/
+     height: 87vh;
+     overflow: scroll;
 }
 #profModal {
     height: 100%;
     width: 90%;
     font-size: 20px;
+}
+
+#legend{
+  height: 60vh;
+  overflow: scroll;
+}
+
+tbody {
+  display:block;
+  height:80vh;
+  overflow:auto;
+}
+thead, tbody tr {
+  display:table;
+  width:100%;
+  table-layout:fixed;
+}
+thead {
+  width: calc( 100% - 1em )
+}
+table {
+  width:100%;
+}
+
+td{
+    word-wrap:break-word
 }

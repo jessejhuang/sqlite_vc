@@ -209,11 +209,9 @@ class ProfileChart {
         for(let i = 0; i < history.length; i++){
             if(history[i].amount){
                 sum += history[i].amount;
-                // let year = history[i].date.match(/\d+/g)[0];
                 cumulative.push({
                     amount: sum,
                     type: history[i].type,
-                    // year: +year
                     date: history[i].date
                 });
             }
@@ -303,11 +301,6 @@ class ProfileChart {
             .attr('transform', 'translate(70, 27)')
             .style('font', `${self.fontSize}px`)
             .call(d3.axisLeft(yScale));
-        // let fundingType = data['cb_funding_rounds.funding_round_type']
-        //     ? data['cb_funding_rounds.funding_round_type'] !== 'other'
-        //         ? `Funding Type: ${data['cb_funding_rounds.funding_round_type']}`
-        //         : 'Funding Type: Wildcard'
-        //     : 'Funding Type: N/A'
     }
 
     scatter(name, history){

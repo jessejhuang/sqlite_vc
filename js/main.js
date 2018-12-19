@@ -24,8 +24,13 @@ console.time("Main");
         let yearMax = data.yearMax;
         let type = data.type;
         let cities = data.cities;
+        let f_instance = M.FormSelect.getInstance($('#fundingType'));
+        let c_instance = M.FormSelect.getInstance($('#categories'));
+        let funding_round_types = f_instance.getSelectedValues();
+        let category_codes = c_instance.getSelectedValues();
+        
         if(cities){
-            let linkQuery = DB.linkQuery(yearMin, yearMax, cities, type);
+            let linkQuery = DB.linkQuery(yearMin, yearMax, cities, funding_round_types, category_codes, type);
             let linkResponse = DB.processQuery(linkQuery, DB.formatLinkData);
 
             let nodeQuery = DB.nodeQuery(linkQuery);
@@ -43,7 +48,26 @@ console.time("Main");
                     console.log(err);
                 });
         }
-    };
+    }
+    
+    function legendUpdate(data){
+        let colorTable = data;
+        console.log("ColorTable: ", colorTable);
+        $("#legend").html('');
+        $( "#legend" ).append( "<ul id='legend-body'></ul>" );
+        
+        for(let key in colorTable){
+            //markup = "<li class='collection-item "+colorTable[key]+"'>"+key+"</li>";
+            //markup = "<li class='collection-item' style='text-color:"+colorTable[key]+"'>"+key+"</li>";
+            markup = `<li style='height:2vh;'>
+                        <svg preserveAspectRatio='xMinYMin meet' viewBox='0 0 100 10'>
+                            <text dx='2' dy='6' text-anchor='left' font-size='0.5vh'>${key}</text>
+                            <line x1='80' y1='5' x2='100' y2='5' style='stroke:${colorTable[key]};stroke-width:1' />
+                        </svg>
+                    </li>`;
+            $("#legend-body").append(markup);
+        }
+    }
 
    //Creating instances for each visualization
     let DB = new Database();
@@ -53,7 +77,7 @@ console.time("Main");
     //let mapData = null;
     //let timeData = null;
     let vcMap = new VCMap(directoryChart,networkGraph,networkUpdate, DB);
-    let timeSelector= new TimeSelector(directoryChart,vcMap);
+    let timeSelector= new TimeSelector(directoryChart,vcMap, legendUpdate);
 
     function init() {
 
@@ -117,10 +141,44 @@ console.time("Main");
                 });
         }
 
+
+        // On filter, retrieve new data
+        function updateTransactionList() {
+
+            var f_instance = M.FormSelect.getInstance($('#fundingType'));
+            var c_instance = M.FormSelect.getInstance($('#categories'));
+
+            let funding_round_types = f_instance.getSelectedValues();
+            let catagory_codes= c_instance.getSelectedValues();
+
+            directoryChart.cities = [];
+            directoryChart.update();
+            // self.directoryChart.cities = self.selectedCities;
+            // self.directoryChart.update();
+
+            //console.log("funding types: ", funding_round_types);
+            //console.log("catagory types: ", catagory_codes);
+
+
+            // query = DB.lineQuery(funding_round_types, catagory_codes);
+            // DB.processQuery(query, DB.formatLineData)
+            //     .then(e => {
+            //         lineData = e;
+            //         // timeSelector.initiate(lineData);
+            //     }) 
+            //     .then(() => {
+            //         timeSelector.update();
+            //     }, err => {
+            //         console.log(err);
+            //     });
+        }
+
+
         function filterUpdates() {
             console.log("Filter Updates");
             updateMap();
             updateLine();
+            updateTransactionList();
         }
         
         $('select').formSelect($('select').on('change', filterUpdates));  

@@ -30,8 +30,8 @@ class NetworkGraph {
                 .force("charge", d3.forceManyBody().strength(-250).distanceMax(200).distanceMin(60))
                 .force("collide", d3.forceCollide(function(){return 5;}))
                 .force("center", d3.forceCenter(this.width/2,this.height/2))
-                .force("x", d3.forceX().strength(0.005))
-                .force("y", d3.forceY().strength(0.005));
+                .force("x", d3.forceX().strength(0.003))
+                .force("y", d3.forceY().strength(0.003));
                 
         //this.simulation.alphaDecay(0.4).alphaTarget(0.01).alphaMin(0.1);
         this.simulation.restart().alpha(1).alphaDecay(0.01).alphaTarget(0.29).alphaMin(0.3).velocityDecay(0.6);

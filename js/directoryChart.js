@@ -49,8 +49,14 @@ class DirectoryChart {
 				years.push(j);
 			}
 			// console.log(years);
+			console.log("dir cities:");
+			console.log(self.cities);
 
-			let query = self.DB.directoryQuery(years, [self.cities], [funding_round_types], [catagory_codes]);
+			// Remove old table
+			//$("#transaction-list thead").remove();
+			$("#transaction-list tbody tr").remove();
+
+			let query = self.DB.directoryQuery(years, self.cities, funding_round_types, catagory_codes);
 			if(self.cities.length !== 0){
 				console.log("min year: " + this.current);
 				console.log("max year: " + this.maxYear);
@@ -58,23 +64,34 @@ class DirectoryChart {
 					.then(e => {
 						let directoryData = JSON.parse(JSON.stringify(e)).sort();
 						let markup;
-						$("#transaction-list thead").remove();
-						$("#transaction-list tr").remove();
+						//$("#transaction-list thead").remove();
+						// $("#transaction-list tbody").empty();
 
 						// Header
-						let header = "<thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>"
-						$("#transaction-list").append(header);
-
-						let maxRows = 100;
+						//let header = "<thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>"
+						//$("#transaction-list").append(header);
+						let raisedAmount;
+						let maxRows = Math.min(150, directoryData.length);
 						for (let i=0; i < maxRows; i++) {
 							let entityId = `entity${i}`
 							let investorId = `investor${i}`
+							let raisedAmount = directoryData[i]['Raised amount'];
+							if (raisedAmount > 999999999) {
+								raisedAmount = (raisedAmount/1000000000)
+								raisedAmount = Math.round(raisedAmount * 10) / 10;
+								raisedAmount = ("$" + raisedAmount + "B");
+							} else if (raisedAmount > 999999) {
+								raisedAmount = (raisedAmount/1000000)
+								raisedAmount = Math.round(raisedAmount * 10) / 10;
+								raisedAmount = ("$" + raisedAmount + "M");
+							}
+							console.log('raised amounts: ', raisedAmount)
 							markup = `
 								<tr>	
 									<td>${directoryData[i]['Funded at']}										 </td>
 									<td id="${entityId}">${directoryData[i]['Funded entity']}</td>
 									<td id="${investorId}">${directoryData[i]['Investor']}	 </td>
-									<td>${directoryData[i]['Raised amount']}								 </td>
+									<td>${raisedAmount}								 											 </td>
 									<td>${directoryData[i]['Category']}											 </td>
 									<td>${directoryData[i]['Funding round']}							   </td>
 									<td>${directoryData[i]['State']}												 </td>

@@ -60,18 +60,48 @@ class VCMap {
             .translate([this.width / 2, this.height / 2]);
         this.tooltip = d3.tip()
             .attr('class', 'd3-tip')
-            .direction('e')
+            .direction('w')
             .html((city, funds, minYear, maxYear) => {
-            let funding_round_type = d3.select('#fundingType').property('value');
-            let catagory_code = d3.select('#categories').property('value');
-            if (funding_round_type=="") { funding_round_type = "All"};
-            if (catagory_code=="") { catagory_code = "All"};
+            var f_instance = M.FormSelect.getInstance($('#fundingType'));
+            var c_instance = M.FormSelect.getInstance($('#categories'));
+
+            let funding_round_types = f_instance.getSelectedValues();
+            let catagory_codes= c_instance.getSelectedValues();
+
+            let funding_round_type = '';
+            for (let i=0; i < funding_round_types.length; i++) {
+                funding_round_type += funding_round_types[i];
+                if (i < funding_round_types.length-1) {
+                    funding_round_type += ", "
+                }
+            }
+
+            let catagory_code = '';
+            for (let i=0; i < catagory_codes.length; i++) {
+                catagory_code += catagory_codes[i];
+                if (i < catagory_codes.length-1) {
+                    catagory_code += ", "
+                }
+            }
+            if (funding_round_type=="") { funding_round_type = "All funding rounds"};
+            if (catagory_code=="") { catagory_code = "All categories"};
+
+            let displayFunds = parseInt(funds.replace(",", "").replace(",", "").replace(",", ""));
+            if (displayFunds > 999999999) {
+                displayFunds = (displayFunds/1000000000)
+                displayFunds = Math.round(displayFunds * 10) / 10;
+                displayFunds = ("$" + displayFunds + "B");
+            } else if (displayFunds > 999999) {
+                displayFunds = (displayFunds/1000000)
+                displayFunds = Math.round(displayFunds * 10) / 10;
+                displayFunds = ("$" + displayFunds + "M");
+            }
 
                 let template = `
                 <h4>${city} ${minYear}-${maxYear}</h4>
                 <p>Fund type: ${funding_round_type}</p>
                 <p>Venture category: ${catagory_code}</p>
-                <p>Amount: $${funds}</p>
+                <p>Total amount invested: ${displayFunds}</p>
                 <div id='tipDiv'></div>
                 `;
                 return template;
@@ -106,11 +136,17 @@ class VCMap {
     }
     initialize(data){
         this.data = JSON.parse(data);
+
+        // if (cities != null) {
+        //     console.log("set selectedCities");
+        //     this.selectedCities = cities;
+        // }
     }
     
     update() {
-        // console.log("initial data: " + Object.keys(this.data))
         let self = this;
+        console.log("selected cities in update");
+        console.log(self.selectedCities);
         const toolTipScale = d3.scaleLinear()
             .domain([10, 10000000000])
             .range([0, 190]);
@@ -157,29 +193,17 @@ class VCMap {
                     .attr('r', city => {
                         let funds = 0;
                         let nextFunds = 0;
-                        // console.log(self.current);
                         for (var i = self.current; i < self.maxYear+1; i++) {
                             nextFunds = data[city][i];
-                            // console.log(nextFunds);
                             if ( (nextFunds != 0) && (typeof(nextFunds) != "undefined") ){
                                 funds += nextFunds;
                             }
                         }
-
-                        // let funds = data[city][self.current];
-                        // console.log(data[city][self.current-1]);
                         if ( (funds === 0) || (typeof(funds) == "undefined") ){
                             return 0;
                         }
                         return scale(funds);
                     })
-                    // .attr('r', city => {
-                    //     let funds = data[city][self.current];
-                    //     if ( (funds === 0) || (typeof(funds) == "undefined") ){
-                    //         return 0;
-                    //     }
-                    //     return scale(funds);
-                    // })
                     .on('mouseover', city => {
 
                         let funds = 0;
@@ -190,74 +214,27 @@ class VCMap {
                                 funds += nextFunds;
                             }
                         }
-                        // let funds = data[city][self.current];
                         let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
                         self.tooltip.show(city, format_funds, this.current, this.maxYear);
 
                         // Get data for summary chart
-                        // let funding_round_type = d3.select('#fundingType').property('value');
-                        // let catagory_code = d3.select('#categories').property('value');
+                        var f_instance = M.FormSelect.getInstance($('#fundingType'));
+                        var c_instance = M.FormSelect.getInstance($('#categories'));
 
-                        // let query = self.DB.lineQuery(funding_round_type, catagory_code);
-                        // self.DB.processQuery(query, self.DB.formatLineData)
-                        //     .then(e => {
-                        //         lineData = e;
-                                // console.log("new line dataaaaaaa: " + lineData);
+                        let funding_round_types = f_instance.getSelectedValues();
+                        let catagory_codes= c_instance.getSelectedValues();
 
-                        let tipSVG = d3.select("#tipDiv")
-                                      .append("svg")
-                                      .attr("width", 200)
-                                      .attr("height", 50);
-
-
-
-                            tipSVG.append("rect")
-                            .attr("fill", "rgb(152,255,204)")
-                            .attr("y", 10)
-                            .attr("width", 0)
-                            .attr("height", 30)
-                            .transition()
-                            .duration(500)
-                            .attr("width", toolTipScale(funds));
-
-                                // for (let k = 0; k < lineData.length; k++) {
-                                //     tipSVG.append("rect")
-                                //     .attr("fill", "steelblue")
-                                //     .attr("y", k*10)
-                                //     .attr("width", 0)
-                                //     .attr("height", 30)
-                                //     .transition()
-                                //     .duration(500)
-                                //     .attr("width", k * 6);
-                                // }
-
-                                    // if (element[0] === 'USA'){
-                                    //     let lat = element[1];
-                                    //     let lon = element[2];
-                                    //     x = self.projection([lon, lat])[0];
-                                    // }
-                             
-
-
-                                                // tipSVG.append("rect")
-                                                // .attr("fill", "steelblue")
-                                                // .attr("y", 10)
-                                                // .attr("width", 0)
-                                                // .attr("height", 30)
-                                                // .transition()
-                                                // .duration(1000)
-                                                // .attr("width", 3 * 6);
-
-                                            // tipSVG.append("text")
-                                            //   .text("ay")
-                                            //   .attr("x", 10)
-                                            //   .attr("y", 30)
-                                            //   .transition()
-                                            //   .duration(1000)
-                                            //   .attr("x", 6 + 3 * 6)
+                        let query = self.DB.lineQuery(funding_round_types, catagory_codes, city);
+                        self.DB.processQuery(query, self.DB.formatLineData)
+                            .then(e => {
+                                lineData = e;
+                                let tipCitySummary = new CitySummary(this.current, this.maxYear);
+                                tipCitySummary.initiate(lineData);
+                                tipCitySummary.update();
                                 // timeSelector.initiate(lineData);
-                            // });
-
+                            }, err => {
+                                console.log(err);
+                            });
                     })
                     .on('mouseout', city => {
                         // let funds = data[city][self.current]; 
@@ -272,28 +249,18 @@ class VCMap {
                         let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
                         self.tooltip.hide(city, format_funds);
                     })
-                    // .on('mouseover', city => {
-                    //     let funds = data[city][self.current];
-                    //     let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-                    //     self.tooltip.show(city, format_funds);
-                    // })
-                    // .on('mouseout', city => {
-                    //     let funds = data[city][self.current]; 
-                    //     let format_funds = funds.toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
-                    //     self.tooltip.hide(city, format_funds);
-                    // })
                     // On click update the directory chart based on the clicked city
                     .on('click', function(city) {
                         // If the city is selected, remove it from list of selected
                         if (self.selectedCities.indexOf(city) >= 0) {
                             let spliceIndex = self.selectedCities.indexOf(city);
                             self.selectedCities.splice(spliceIndex, 1);
-                            d3.select(this).style('fill', 'rgb(217, 91, 67');
+                            d3.select(this).style('fill', 'rgb(152,255,204)');
                         } 
                         // City is not selected. Update selected list
                         else {
                             self.selectedCities.push(city);
-                            d3.select(this).style('fill', 'rgb(152,255,204)');
+                            d3.select(this).style('fill', ' rgb(255,255,0)');
                         }
                         // Update the directory chart based on the list of selected cities
                         self.directoryChart.cities = self.selectedCities;
@@ -301,7 +268,13 @@ class VCMap {
                         let networkParams = {"yearMin":self.current,"yearMax":self.maxYear,"type":"city","cities":self.selectedCities};
                         self.networkUpdate(JSON.stringify(networkParams));
                     })
-                    .style('fill', "rgb(152,255,204)")	
+                    .style('fill', function(city) {
+                        if (self.selectedCities.indexOf(city) >= 0) {
+                            return "rgb(255,255,0)";
+                        } else {
+                            return "rgb(152,255,204)";
+                        }
+                        })	
                     .style('opacity', 1);
             self.dots.selectAll(".city[cx='0']").remove();
         });
