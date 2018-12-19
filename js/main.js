@@ -43,7 +43,26 @@ console.time("Main");
                     console.log(err);
                 });
         }
-    };
+    }
+    
+    function legendUpdate(data){
+        let colorTable = data;
+        console.log("ColorTable: ", colorTable);
+        $("#legend").html('');
+        $( "#legend" ).append( "<ul id='legend-body'></ul>" );
+        
+        for(let key in colorTable){
+            //markup = "<li class='collection-item "+colorTable[key]+"'>"+key+"</li>";
+            //markup = "<li class='collection-item' style='text-color:"+colorTable[key]+"'>"+key+"</li>";
+            markup = `<li style='height:2vh;'>
+                        <svg preserveAspectRatio='xMinYMin meet' viewBox='0 0 100 10'>
+                            <text dx='2' dy='6' text-anchor='left' font-size='0.5vh'>${key}</text>
+                            <line x1='80' y1='5' x2='100' y2='5' style='stroke:${colorTable[key]};stroke-width:1' />
+                        </svg>
+                    </li>`;
+            $("#legend-body").append(markup);
+        }
+    }
 
    //Creating instances for each visualization
     let DB = new Database();
@@ -53,7 +72,7 @@ console.time("Main");
     //let mapData = null;
     //let timeData = null;
     let vcMap = new VCMap(directoryChart,networkGraph,networkUpdate, DB);
-    let timeSelector= new TimeSelector(directoryChart,vcMap);
+    let timeSelector= new TimeSelector(directoryChart,vcMap, legendUpdate);
 
     function init() {
 
