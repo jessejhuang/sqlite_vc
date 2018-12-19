@@ -70,7 +70,7 @@ class DirectoryChart {
 						// Header
 						//let header = "<thead><tr><th>Funded at</th><th>Funded entity</th><th>Investor</th><th>Raised amount</th><th>Category</th><th>Funding round</th><th>State</th><th>City</th></tr></thead>"
 						//$("#transaction-list").append(header);
-
+						let raisedAmount;
 						let maxRows = Math.min(150, directoryData.length);
 						for (let i=0; i < maxRows; i++) {
 							console.log(directoryData[i]);
@@ -78,7 +78,19 @@ class DirectoryChart {
                  			markup += "<td>" + directoryData[i]['Funded at'] + "</td>"
                  			markup += "<td>" + directoryData[i]['Funded entity'] + "</td>"
                  			markup += "<td>" + directoryData[i]['Investor'] + "</td>"
-                 			markup += "<td>" + directoryData[i]['Raised amount'] + "</td>"
+
+                 			raisedAmount = directoryData[i]['Raised amount'];
+                 			// raisedAmount = parseInt(raisedAmount.replace(",", "").replace(",", "").replace(",", ""));
+				            if (raisedAmount > 999999999) {
+				                raisedAmount = (raisedAmount/1000000000)
+				                raisedAmount = Math.round(raisedAmount * 10) / 10;
+				                raisedAmount = ("$" + raisedAmount + "B");
+				            } else if (raisedAmount > 999999) {
+				                raisedAmount = (raisedAmount/1000000)
+				                raisedAmount = Math.round(raisedAmount * 10) / 10;
+				                raisedAmount = ("$" + raisedAmount + "M");
+				            }
+                 			markup += "<td>" + raisedAmount + "</td>"
                  			markup += "<td>" + directoryData[i]['Category'] + "</td>"
                  			markup += "<td>" + directoryData[i]['Funding round'] + "</td>"
                  			markup += "<td>" + directoryData[i]['State'] + "</td>"
