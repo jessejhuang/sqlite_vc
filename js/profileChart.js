@@ -169,7 +169,7 @@ class ProfileChart {
         d3.select('#profileStatus')
             .text(`Status: ${status}`);
         d3.select('#profileOverview')
-            .text(`Overview:: ${overview}`);
+            .text(`Overview: ${overview}`);
         
         if(companyType === 'Venture'){
             d3.select('#profileTotalFunding')
