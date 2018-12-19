@@ -4,8 +4,8 @@ Legend for line chart
 Connecting profile chart with network and transactions
 Labelling
 Title
-Fix bubble coloring in map
-On city hover summary chart
+Fix bubble coloring in map    X Done
+On city hover summary chart   X Done
 Configure instance to serve up
 
 Wishes
