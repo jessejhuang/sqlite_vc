@@ -47,20 +47,20 @@
 		});
 	}
 
-	mapQuery(funding_round_type, category_code, limit){
+	mapQuery(funding_round_type, category_code, city=null){
 		// Always select these fields
   
-  if (funding_round_type[0]== '') {
-   funding_round_type = [];
-  }
-  if (category_code[0] == '') { 
-			category_code = [];
+		if (funding_round_type[0]== '') {
+		funding_round_type = [];
 		}
-  
-  if(funding_round_type.length == 0){
-    funding_round_type = 'IS NOT NULL';
-  }
-  else if(funding_round_type.length == 1){
+		if (category_code[0] == '') { 
+				category_code = [];
+			}
+
+		if(funding_round_type.length == 0){
+		funding_round_type = 'IS NOT NULL';
+		}
+		else if(funding_round_type.length == 1){
    
 			funding_round_type = `IN (\'${funding_round_type[0]}\')`;
    
@@ -69,10 +69,10 @@
 			funding_round_type = `IN (${funding_round_type.join(', ')})`;
 		}
   
-  if(category_code.length == 0){
-    category_code = 'IS NOT NULL';
-  }
-  else if(category_code.length == 1){
+		if(category_code.length == 0){
+		category_code = 'IS NOT NULL';
+		}
+		else if(category_code.length == 1){
    
 			category_code = `IN (\'${category_code[0]}\')`;
    
@@ -125,9 +125,6 @@
 		}
 		//Sort
 		query += ' ORDER BY cb_objects_venture.city, year';
-		if(limit){
-			query += `LIMIT ${limit}`;
-		}
 		query += ';';
   //console.log(query);
 		return query;
@@ -162,17 +159,17 @@
 		return cities;
 	}
 
-	lineQuery(funding_round_type=[], category_code=[]) {
+	lineQuery(funding_round_type=[], category_code=[], city='None') {
   
-  if (funding_round_type[0]== '') {
-   funding_round_type = [];
-  }
-  if (category_code[0] == '') { 
+		if (funding_round_type[0]== '') {
+			funding_round_type = [];
+		}
+		if (category_code[0] == '') { 
 			category_code = [];
 		}
-  
-  //console.log(funding_round_type);
-  //console.log(category_code);
+
+		//console.log(funding_round_type);
+		//console.log(category_code);
   
 		let processFundingRound =true;
 		let processCategoryCode =true;
@@ -221,6 +218,12 @@
 		//  Filtering
 		if (processFundingRound || processCategoryCode) {
 			query += '\nWHERE \n (cb_objects_venture.country_code=\'USA\') \n AND \n (cb_objects_venture.state_code!=\'None\')'
+		}
+
+		if (city == "None") {
+			query += "\n AND \n(cb_objects_venture.city != \'None\')"
+		} else {
+			query += "\n AND \n(cb_objects_venture.city == \'" + city + "\')"
 		}
 
 		if (processFundingRound || processCategoryCode) {
@@ -359,6 +362,8 @@
 
 
 	directoryQuery(years, cities, funding_round_types, category_codes){
+		// console.log("cities");
+		// console.log(cities);
 		let query = '';
 		query += 'SELECT funded_at, funded_object.name, investor_object.name, funded_object.category_code, cb_funding_rounds.raised_amount_usd, funded_object.state_code, funded_object.city, cb_funding_rounds.funding_round_type'
 		
@@ -386,9 +391,12 @@
 
 		// Cities
 		if (cities.length>0 && cities[0]!='') {
+			// cities = cities[0];
 			query += "\nAND\nfunded_object.city in ("
 
 			for (let i=0; i < cities.length; i++) {
+				// console.log("next city");
+				// console.log(cities[i]);
 				query += "\'" + cities[i] + "\'"
 				if (i < cities.length-1) {
 					query += ", "
@@ -399,6 +407,7 @@
 
 		// Funding round types
 		if (funding_round_types.length>0 && funding_round_types[0]!='') {
+			// funding_round_types = funding_round_types[0];
 			query += "\nAND\ncb_funding_rounds.funding_round_type in ("
 
 			for (let i=0; i < funding_round_types.length; i++) {
@@ -412,6 +421,7 @@
 
 		// Category codes
 		if (category_codes.length>0 && category_codes[0]!='') {
+			// category_codes = category_codes[0];
 			query += "\nAND\nfunded_object.category_code in ("
 
 			for (let i=0; i < category_codes.length; i++) {
@@ -425,6 +435,8 @@
 
 		query += "\ORDER BY cb_funding_rounds.raised_amount_usd DESC, funded_at DESC;"
 
+		// console.log("dir query");
+		// console.log(query);
 		return query;
 	}
 
@@ -434,6 +446,8 @@
 		let columnNames = ["Funded at", "Funded entity", "Investor", "Category", "Raised amount", "State", "City", "Funding round"]
 
 		let processedData = [];
+		// console.log("res");
+		// console.log(res);
 		let data = res['0']['values'];
 		let nextDataPoint;
 		let nextDict;
@@ -448,7 +462,7 @@
 			}
 			processedData.push(nextDict);
 		}
-		console.log(processedData)
+		// console.log(processedData)
 		return(processedData)
 	}
 
