@@ -50,7 +50,7 @@ body {
 
 tbody {
   display:block;
-  height:85vh;
+  height:80vh;
   overflow:auto;
 }
 thead, tbody tr {
