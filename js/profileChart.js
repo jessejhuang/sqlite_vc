@@ -19,11 +19,7 @@ class ProfileChart {
             .attr('height', '100%')
             .attr('id', 'profHeaderSVG');
 
-        this.summarySVG = d3.select('#profSummary').append('svg')
-            .attr('width', '100%')
-            .attr('height', '100%')
-            .attr('id', 'profSummarySVG');
-
+        this.summaryList = d3.select('#summaryList')
         this.cdfSVG = d3.select('#profCDF').append('svg')
             .attr('id', 'profCdfSVG')
             .attr("preserveAspectRatio", "xMinYMin meet")
@@ -41,26 +37,6 @@ class ProfileChart {
             .attr("preserveAspectRatio", "xMinYMin meet")
             .attr("viewBox", "0 0 "+this.width_full+" "+this.height_full)
             .attr("align","center");
-
-        this.tooltip = d3.tip()
-            .attr('class', 'd3-tip')
-            .direction('e')
-            .html(d => {
-                let name = d.name;
-                let amount = d.amount;
-                let date = d.date;
-                let type = d.type;
-                let formatTime = d3.timeFormat("%B %d, %Y");
-                return `
-                    <h4>${name}</h4>
-                    <p>Fund type: ${type}</p>
-                    <p>Date of Transaction: ${formatTime(date)}</p>
-                    <p>Amount: $${amount}</p>
-                `;
-            });
-        this.cdfSVG.call(this.tooltip);
-        this.barSVG.call(this.tooltip);
-        this.scatterSVG.call(this.tooltip);
 
         this.y1 = 10; // Starting y value for data attribute
         this.initiate();
@@ -95,59 +71,55 @@ class ProfileChart {
             .attr('x', '15%')
             .attr('y', '70%')
             .style('font-size', '15px')
-        self.summarySVG.append('text')
+
+        self.summaryList.append('text')
             .text('Venture')
             .attr('id', 'profileType')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
             .style('font-size', '20px');
-        self.y1 += 15;
-        self.summarySVG.append('text')
-            .text('Year Founded: 2018')
-            .attr('id', 'profileYearFounded')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
-            .style('font-size', '20px');
-        self.y1 += 15;
-        self.summarySVG.append('text')
-            .text('City: St. Louis')
-            .attr('id', 'profileCity')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
-            .style('font-size', '20px');
-        self.y1 += 15;
-        self.summarySVG.append('text')
-            .text('Status: Operating')
-            .attr('id', 'profileStatus')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
-            .style('font-size', '20px');
-        self.y1 += 15;
-        self.summarySVG.append('text')
-            .text('First Funded: 2013')
-            .attr('id', 'profileFirstFunded')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
-            .style('font-size', '20px');
-        self.y1 += 15;
-        self.summarySVG.append('text')
-            .text('Last Funded: 2013')
-            .attr('id', 'profileLastFunded')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
-            .style('font-size', '20px');
-        self.y1 += 15;
-        self.summarySVG.append('text')
-            .text('Total Raised: $0')
-            .attr('id', 'profileTotalFunding')
-            .attr('x', '5%')
-            .attr('y', `${self.y1}%`)
-            .style('font-size', '20px');
-        self.y1 += 15;
+        self.summaryList.append('li')
+            .append('p')
+                .text('Year Founded: 2018')
+                .attr('id', 'profileYearFounded')
+                .style('font-size', '20px');
+        self.summaryList.append('li')
+            .append('p')
+                .text('City: St. Louis')
+                .attr('id', 'profileCity')
+                .style('font-size', '20px');
+        self.summaryList.append('li')
+            .append('p')
+                .text('Status: Operating')
+                .attr('id', 'profileStatus')
+                .style('font-size', '20px');
+        self.summaryList.append('li')
+            .append('p')
+                .text('First Funded: 2013')
+                .attr('id', 'profileFirstFunded')
+                .style('font-size', '20px');
+
+        self.summaryList.append('li')
+            .append('p')
+                .text('Last Funded: 2013')
+                .attr('id', 'profileLastFunded')
+                .style('font-size', '20px');
+
+        self.summaryList.append('li')
+            .append('p')
+                .text('Total Raised: $0')
+                .attr('id', 'profileTotalFunding')
+                .style('font-size', '20px');
+
+        self.summaryList.append('li')
+            .append('p')
+                .text('Overview: N/A')
+                .attr('id', 'profileOverview')
+                .style('font-size', '20px');
+                
     }
 
     summary(data){
         let self = this;
+        console.log('summary: ', data)
         let companyType = data.entity_type === 'FinancialOrg' ? 'Entity Type: Venture' :
             data.entity_type === 'People' ? 'Entity Type: Person' :
             'Entity Type: VC Firm';
@@ -156,10 +128,24 @@ class ProfileChart {
         let description = data.description ? data.description : data.short_description;
         let status = data['cb_objects.status'];
 
-        let year = data['cb_funding_rounds.funded_at'];
         let yearFounded = data['founded_at'] ? data['founded_at'] : 'Unknown';
-        let firstYear = data['first_funding_at'] ? data['first_funding_at'] : year;
-        let lastYear = data['last_funding_at'] ? data['last_funding_at'] : year;
+        let firstYear = data['first_funding_at'] ? data['first_funding_at'] : 'Unknown';
+        let lastYear = data['last_funding_at'] ? data['last_funding_at'] : 'Unknown';
+        let overview = data['overview'] ? data['overview'] : 'N/A';
+
+        let matches;
+        matches = yearFounded.match(/\d+/g)
+        if(matches[0]){
+            yearFounded = matches[0]
+        }
+        matches = firstYear.match(/\d+/g)
+        if(matches[0]){
+            firstYear = matches[0]
+        }
+        lastYear = lastYear.match(/\d+/g)
+        if(matches[0]){
+            yearFounded = matches[0]
+        }
 
         let totalFunding = data.funding_total_usd
             ? data.funding_total_usd
@@ -183,6 +169,8 @@ class ProfileChart {
             .text(`City: ${data.city}`);
         d3.select('#profileStatus')
             .text(`Status: ${status}`);
+        d3.select('#profileOverview')
+            .text(`Overview:: ${overview}`);
         
         if(companyType === 'Venture'){
             d3.select('#profileTotalFunding')
@@ -240,7 +228,7 @@ class ProfileChart {
             .style('font', `${self.fontSize}px`)
             .call(yAxis);
         self.cdfSVG.append('g')
-            .attr('transform', 'translate(70, 257)')
+            .attr('transform', 'translate(70, 276)')
             .style('font', `${self.fontSize}px`)
             .call(xAxis);
         self.cdfSVG.append('path')
@@ -336,18 +324,6 @@ class ProfileChart {
                 .attr('cx', d => xScale(parseDate(d.date)))
                 .attr('cy', d => yScale(d.amount ? d.amount : 0))
                 .attr('transform', 'translate(71, 0)')
-                .on('mouseover', d => {
-                    let datum = {
-                        name,
-                        amount: d.amount,
-                        type: d.type,
-                        date: d.date,
-                    }
-                    self.tooltip.show(datum, self.scatterSVG);
-                })
-                .on('mouseout', () => {
-                    self.tooltip.hide();
-                })
                 .style('fill', d => colors(d.fundingType))
 
     }

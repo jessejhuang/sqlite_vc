@@ -56,6 +56,12 @@ body {
   overflow: scroll;
 }
 
+#profSummary{
+    height: 30vh;
+    overflow: scroll;
+    hyphens: auto;
+  }
+
 tbody {
   display:block;
   height:80vh;
