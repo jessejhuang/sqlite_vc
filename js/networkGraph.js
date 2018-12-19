@@ -27,7 +27,7 @@ class NetworkGraph {
                 .force("link", d3.forceLink()
                 .strength(0.2)
                 .id(function(d){return d.name;})
-                .distance(function(){return 80;}))
+                .distance(function(){return 120;}))
                 .force("charge", d3.forceManyBody().strength(-250).distanceMax(200).distanceMin(60))
                 .force("collide", d3.forceCollide(function(){return 5;}))
                 .force("center", d3.forceCenter(this.width/2,this.height/2))
@@ -102,12 +102,12 @@ class NetworkGraph {
                 return d.r;
             })
             .attr("fill", function(d) {
-            
-                return self.color(d.type);
+                return (d.type == 'vc' ? 'LightSkyBlue' : 'LightCoral');
+                //return self.color(d.type);
             })
-            .attr("opacity","0.5")
+            .attr("opacity","1.0")
             .attr("stroke", function() {
-                return 'black';
+                return 'grey';
             })
             .on('click',click)
             .call(d3.drag()
@@ -128,7 +128,8 @@ class NetworkGraph {
             .text(function(d){return d.name;})
             .attr("dx", 0)
             .attr("dy", 5)
-            .attr("font-size", "1.5vh")
+            .attr("font-size", "2vh")
+            .attr("font-weight", "bold")
             .attr("text-anchor", "middle")
             .attr("fill", function() {
             return "black";
