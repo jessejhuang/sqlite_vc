@@ -2,6 +2,12 @@ body {
     font: 14px sans-serif;
 }
 
+.modal {
+  width: 90% !important ;
+  max-height: 90% !important ;
+  top: 2% !important
+}
+
 .sideBar {
     width: 25%;
     float:right;
