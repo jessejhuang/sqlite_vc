@@ -25,14 +25,14 @@ class NetworkGraph {
         this.simulation = d3.forceSimulation();
         this.simulation
                 .force("link", d3.forceLink()
-                .strength(0.2)
+                .strength(0.05)
                 .id(function(d){return d.name;})
                 .distance(function(){return 80;}))
-                .force("charge", d3.forceManyBody().strength(-250).distanceMax(200).distanceMin(60))
-                .force("collide", d3.forceCollide(function(){return 5;}))
+                .force("charge", d3.forceManyBody().strength(-300).distanceMax(200).distanceMin(80))
+                .force("collide", d3.forceCollide(function(){return 2;}))
                 .force("center", d3.forceCenter(this.width/2,this.height/2))
-                .force("x", d3.forceX().strength(0.003))
-                .force("y", d3.forceY().strength(0.003));
+                .force("x", d3.forceX().strength(0.001))
+                .force("y", d3.forceY().strength(0.001));
                 
         //this.simulation.alphaDecay(0.4).alphaTarget(0.01).alphaMin(0.1);
         this.simulation.restart().alpha(1).alphaDecay(0.01).alphaTarget(0.29).alphaMin(0.3).velocityDecay(0.6);
@@ -81,8 +81,8 @@ class NetworkGraph {
             .data(graph.links)
             .enter().append("line")
             .attr('stroke', 'black')
-            .attr("opacity","0.5")
-            .attr("stroke-width", function() { return 1;});
+            .attr("opacity","0.2")
+            .attr("stroke-width", function() { return 3;});
             
         ////set radius scale
         //var maxValue = d3.max(graph.nodes, function(d){return d.value;});
@@ -90,9 +90,53 @@ class NetworkGraph {
         //var radiusScale = d3.scaleSqrt()
         //    .domain([0, maxValue])
         //    .range([2, 15]);
+        
+        var g = svg.append("g");
+        
+        var node = g.selectAll("node")
+            .data(graph.nodes)
+            .enter().append("g")
+            .attr("class", "node")
+            .call(d3.drag()
+            .on("start", dragstarted)
+            .on("drag", dragged)
+            .on("end", dragended));
+            
+        var image = node.append("image")
+			 .attr("xlink:href", function(d){return (d.logo_url ? d.logo_url : 'images/default_logo.jpg');})
+            .attr("x", function(){return -50;})
+            .attr("y", function(){return -50;})
+            .attr("width", function(){return 100;})
+            .attr("height", function(){return 100;});
+            
+        var setEvents = image
+          // Append hero text
+          .on( 'click', click)
 
-        //var node = svg.append("g")
-        //    .attr("class", "nodes")
+          .on( 'mouseenter', function() {
+            // select element in current context
+            d3.select( this )
+              .transition()
+              .attr("x", function(d) { return -150;})
+              .attr("y", function(d) { return -150;})
+              .attr("height", 300)
+              .attr("width", 300);
+          })
+          // set back
+          .on( 'mouseleave', function() {
+            d3.select( this )
+              .transition()
+              .attr("x", function(d) { return -50;})
+              .attr("y", function(d) { return -50;})
+              .attr("height", 100)
+              .attr("width", 100);
+          });
+
+            
+        //var node = svg.append("g");
+        //    
+        //    
+        //node.attr("class", "nodes")
         //    .selectAll("circle")
         //    .data(graph.nodes)
         //    .enter().append("circle")
@@ -105,7 +149,7 @@ class NetworkGraph {
         //    
         //        return self.color(d.type);
         //    })
-        //    .attr("opacity","0.5")
+        //    .attr("opacity","0.0")
         //    .attr("stroke", function() {
         //        return 'black';
         //    })
@@ -119,17 +163,19 @@ class NetworkGraph {
             
         
         // Append images
-        var node = svg.append("g")
-            .attr("class", "images")
-            .selectAll("image")
-            .data(graph.nodes)
-            .enter().append("image")
-            .attr("xlink:href",  function(d) { return d.logo_url;})
-            .on('click',click)
-            .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
+        //node.selectAll("image")
+        //    .data(graph.nodes)
+        //    .enter().append("image")
+        //    .attr("xlink:href",  function(d) { return d.logo_url;})
+        //    .attr("dx", -8)
+        //    .attr("dy", -8)
+        //    .attr("width", 16)
+        //    .attr("height", 16)
+        //    .on('click',click)
+        //    .call(d3.drag()
+        //    .on("start", dragstarted)
+        //    .on("drag", dragged)
+        //    .on("end", dragended));
         //node.enter().append("image")
         //    .attr("xlink:href",  function(d) { return d.logo_url;})
         //    .attr("x", function(d) { return -25;})
@@ -153,24 +199,24 @@ class NetworkGraph {
     
         
         //// maybe do city centroids
-        var label = svg.append('g')
-            .attr("class", "label")
-            .selectAll("text")
-            .data(graph.nodes)
-            .enter().append("text")
-            .text(function(d){return d.name;})
-            .attr("dx", 0)
-            .attr("dy", 5)
-            .attr("font-size", "1.5vh")
-            .attr("text-anchor", "middle")
-            .attr("fill", function() {
-            return "black";
-            })
-            .on('click',click)
-            .call(d3.drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended));
+        //var label = svg.append('g')
+        //    .attr("class", "label")
+        //    .selectAll("text")
+        //    .data(graph.nodes)
+        //    .enter().append("text")
+        //    .text(function(d){return d.name;})
+        //    .attr("dx", 0)
+        //    .attr("dy", 5)
+        //    .attr("font-size", "1.5vh")
+        //    .attr("text-anchor", "middle")
+        //    .attr("fill", function() {
+        //    return "black";
+        //    })
+        //    .on('click',click)
+        //    .call(d3.drag()
+        //    .on("start", dragstarted)
+        //    .on("drag", dragged)
+        //    .on("end", dragended));
         
         function click(d) {
             console.log("clicked: ", d.name);
@@ -187,15 +233,16 @@ class NetworkGraph {
                 .attr("x2", function(d) {return Math.max(0, Math.min(width, d.target.x));})
                 .attr("y2", function(d) {return Math.max(0, Math.min(height, d.target.y));});
             
+            node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
             node
-                
                 .attr("cx", function(d) {return Math.max(d.r, Math.min(width - d.r, d.x));})
                 .attr("cy", function(d) {return Math.max(d.r, Math.min(height - d.r, d.y));});
+              
                 
-            label
-            
-                .attr("x", function(d) {return Math.max(d.r, Math.min(width - d.r, d.x));})
-                .attr("y", function(d) {return Math.max(d.r, Math.min(height - d.r, d.y));});
+            //label
+            //
+            //    .attr("x", function(d) {return Math.max(d.r, Math.min(width - d.r, d.x));})
+            //    .attr("y", function(d) {return Math.max(d.r, Math.min(height - d.r, d.y));});
             
         });
 
