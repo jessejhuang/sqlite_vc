@@ -1,12 +1,18 @@
 Wish list
-Eliminate pre 2000 X
-Brushing for timeline X
-Filterable summary line chart X
-Process book
-Vis div'ing and styling towards "website" -- Jack starting
-Network features -- Different Shapes, Edge Weight, IPO/Acquired/Closed coloring - John starting
-Summary stats in city hover -- Jack pending
+Profile chart
+Legend for line chart
+Connecting profile chart with network and transactions
+Labelling
+Title
+Fix bubble coloring in map
+On city hover summary chart
+Configure instance to serve up
 
-Little charts in profiles 
-In profiles, links to related profiles
-Transitions for play
+Wishes
+Loading screen
+Reach: Logos for network with names in hover
+Reach: Zoomable map
+
+
+Process book
+Website
