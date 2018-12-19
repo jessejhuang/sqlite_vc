@@ -135,15 +135,18 @@ class ProfileChart {
 
         let matches;
         matches = yearFounded.match(/\d+/g)
-        if(matches[0]){
+        console.log("year found matches: " + matches);
+        if(matches){
             yearFounded = matches[0]
         }
         matches = firstYear.match(/\d+/g)
-        if(matches[0]){
+        console.log("firstYear found matches: " + matches);
+        if(matches){
             firstYear = matches[0]
         }
         lastYear = lastYear.match(/\d+/g)
-        if(matches[0]){
+        console.log("lastYear found matches: " + matches);
+        if(matches){
             yearFounded = matches[0]
         }
 
@@ -152,7 +155,7 @@ class ProfileChart {
             : '0';
         
         let funding = data['cb_funding_rounds.raised_amount_usd'];
-
+        // let city = data.city ? "Unknown" : data.city 
         d3.select('#profileLogo')
             .attr('xlink:href', logo);
         d3.select('#profileLink')
