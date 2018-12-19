@@ -6,7 +6,8 @@ class NetworkGraph {
         //d3.select('#networkGraph').html('NETWORK');
         
         this.width = 1500;
-        this.height = 1000;
+        this.height = 1200;
+        
        
         this.svg = d3.select("#networkGraph").append("svg")
             .attr("preserveAspectRatio", "xMinYMin meet")
