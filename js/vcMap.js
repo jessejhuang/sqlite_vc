@@ -60,7 +60,7 @@ class VCMap {
             .translate([this.width / 2, this.height / 2]);
         this.tooltip = d3.tip()
             .attr('class', 'd3-tip')
-            .direction('e')
+            .direction('w')
             .html((city, funds, minYear, maxYear) => {
             var f_instance = M.FormSelect.getInstance($('#fundingType'));
             var c_instance = M.FormSelect.getInstance($('#categories'));
@@ -86,11 +86,21 @@ class VCMap {
             if (funding_round_type=="") { funding_round_type = "All"};
             if (catagory_code=="") { catagory_code = "All"};
 
+            console.log(funds);
+            let displayFunds = parseInt(funds.replace(",", ""));
+            console.log("ahhhhhh");
+            console.log(displayFunds);
+            if (displayFunds > 999999999) {
+                displayFunds = ("$" + (displayFunds/1000000000) + "B");
+            } else if (displayFunds > 999999) {
+                displayFunds = ("$" + (displayFunds/1000000) + "M");
+            }
+
                 let template = `
                 <h4>${city} ${minYear}-${maxYear}</h4>
                 <p>Fund type: ${funding_round_type}</p>
                 <p>Venture category: ${catagory_code}</p>
-                <p>Amount: $${funds}</p>
+                <p>Amount: $${displayFunds}</p>
                 <div id='tipDiv'></div>
                 `;
                 return template;
